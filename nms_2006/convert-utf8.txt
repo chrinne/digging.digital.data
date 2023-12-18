@@ -1,0 +1,22 @@
+Folgendes könnte der Kern eines powershell-Skriptes werden:
+
+```
+# Eine Datei erstellen (hier echter 1252 Name)
+echo test > täöü.txt
+# Dateinamen einlesen, in diesem Fall nur eine Datei, d.h. nachfolgend ohne foreach-objekt
+$f = Get-ChildItem -File t*.txt -Path . -Name
+# Bytes des Dateinamen bei 1252 holen, alternativ in DOS 850
+$bytes = [System.Text.Encoding]::GetEncoding(1252).GetBytes($f)
+# Aus den Bytes den Dateiname in 850 und utf8 schreiben
+$nf = [io.path]::GetFileName([System.Text.Encoding]::GetEncoding(850).GetString($bytes))
+$nf8 = [io.path]::GetFileName([System.Text.Encoding]::UTF8.GetString($bytes))
+# Originale Datei kopieren
+copy-item -literalpath "$f"  "$nf"
+copy-item -literalpath "$f"  "$nf8"
+```
+
+Den Inhalt einer Datei zu konvertieren findet man deutlich häufiger im Netz als Elemente zur Lösung des vorgenannten Problems. Hier meine resultierende Variante. Schreibt alle *.txt umkodiert auf utf8 in einen benachbarten Ordner /utf8/:
+
+```
+get-item *.txt | foreach-object {get-content $_ | out-file ("..\utf8\" + $_.Name) -encoding UTF8}
+```

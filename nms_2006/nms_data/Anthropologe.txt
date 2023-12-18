@@ -1,0 +1,27 @@
+"Anthropologennummer";"Anthropologennachname";"Anthropologenvorname"
+1;"Schröter";"Peter"
+3;"Ausgrabungsteam";
+4;"Keine Bestimmung";
+5;"Röhrer-Ertl";"Olav"
+6;"Grupe";"Gisela"
+9;"Blänkle";"P."
+10;"Ziegelmayer";"G."
+11;"Claassen";"H."
+12;"Unbekannt";
+13;"Ehrhardt";
+14;"Schaefer";"U."
+15;"Cipriano";"A."
+16;"Kunter";"M."
+17;"Burger-Heinrich";"E."
+18;"Götz";"I."
+19;"Anan";"Ali"
+20;"Breitinger";"E."
+21;"Gregor";"Jochen"
+22;"Wahl";"Joachim"
+23;"Munz";"Martina"
+24;"Czarnetzki";"Alfred"
+25;"Gallay";"Gretel"
+26;"Kühl";"Ingrid"
+27;"Lohrke";"Brigitte"
+28;"Volk";"P."
+29;"Fischer";"Eugen"

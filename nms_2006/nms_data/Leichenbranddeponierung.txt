@@ -1,0 +1,5 @@
+"Leichenbranddeponierungsnummer";"Leichenbranddeponierung"
+1;"Urne/Gefäß"
+2;"Häufung"
+3;"Streuung"
+4;"Leichenbrandpartikel in Scheiterhaufenrückständen"

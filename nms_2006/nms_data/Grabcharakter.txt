@@ -1,0 +1,5 @@
+"Grabcharakternummer";"Grabcharakter"
+"1";"Einfachgrab"
+"2";"Erstbestattung/Zentralgrab"
+"3";"Nachbestattung"
+"4";"Charakter fraglich"

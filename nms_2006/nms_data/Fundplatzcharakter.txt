@@ -1,0 +1,5 @@
+"Fundplatzcharakternummer";"Fundplatzcharakter"
+1;"Gräberfeld"
+2;"Grabhügel"
+3;"Einzelfund"
+4;"Streufund"

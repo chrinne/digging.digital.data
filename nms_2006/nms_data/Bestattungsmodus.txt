@@ -1,0 +1,4 @@
+"Bestattungsmodusnummer";"Bestattungsmodus"
+1;"Unbekannt"
+2;"Körperbestattung"
+3;"Brandbestattung"

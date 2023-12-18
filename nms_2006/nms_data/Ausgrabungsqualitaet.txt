@@ -1,0 +1,6 @@
+"Ausgrabungsqualitätsnummer";"Ausgrabungsqualität"
+1;"Forschungsgrabung"
+2;"Fachmännische Notgrabung"
+3;"Laiengrabung"
+4;"Lese-/Zufallsfund"
+5;"Raubgrabung"

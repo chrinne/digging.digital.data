@@ -1,0 +1,5 @@
+"Grabkammernummer";"Grabkammer"
+1;"Nachgewiesen"
+2;"Wahrscheinlich"
+3;"Unwahrscheinlich"
+4;"Keine Aussage möglich"

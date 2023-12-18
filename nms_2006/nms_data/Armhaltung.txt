@@ -1,0 +1,6 @@
+"Armhaltungsnummer";"Armhaltung"
+1;"20-45 Grad (Beckenbereich)"
+2;"45-90 Grad (Bauchbereich)"
+3;"90-180 Grad (Brust-/Schulterbereich)"
+4;"0 Grad (gestreckt)"
+5;"keine Aussage möglich"

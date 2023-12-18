@@ -1,0 +1,3 @@
+"Geschlechtsbestimmungsnummer";"Geschlechtsbestimmung"
+1;"Sicher"
+2;"Unsicher"

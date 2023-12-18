@@ -1,0 +1,5 @@
+"Arch_Geschlechtsbestimmungsnummer";"Arch_Geschlechtsbestimmung"
+1;"Männlich"
+2;"Unbestimmt"
+3;"Weiblich"
+4;"Vermischtes Inventar (Mehrfachbestattung)"

@@ -1,0 +1,4 @@
+"Einfachgrablagenummer";"Einfachgrablage"
+1;"Innerhalb von Grabhügel (zeitliches Verhältnis unklar)"
+2;"am Grabhügelrand (zeitliches Verhältnis unklar)"
+3;"Außerhalb Grabhügel"

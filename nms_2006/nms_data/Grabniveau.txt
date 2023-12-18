@@ -1,0 +1,5 @@
+"Grabniveaunummer";"Grabniveau"
+1;"Unbekannt"
+2;"Grube"
+3;"Ebenerdig"
+4;"Podium"

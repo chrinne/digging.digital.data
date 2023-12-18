@@ -1,0 +1,5 @@
+"Stratigraphische Nummer";"Stratigraphische Beziehung"
+1;"älter als"
+2;"jünger als"
+3;"gleichzeitig mit"
+4;"nicht bestimmbar in Verhältnis zu"

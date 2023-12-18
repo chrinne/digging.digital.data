@@ -1,0 +1,5 @@
+"Publikationsqualitätsnummer";"Publikationsqualität"
+1;"Monographie"
+2;"Vorbericht"
+3;"Fundnotiz"
+4;"Randbemerkung"

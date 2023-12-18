@@ -1,0 +1,567 @@
+"Augsgräbernummer";"Ausgräber";"Ausgräbertätigkeit"
+1;"Unbekannt";
+2;"Denkmalbehörde";
+3;"Eidam, H.";
+4;"Wägemann, Ch. (Pfarrer)";1
+5;"Feuerlein (Rektor)";2
+6;"Gemming, Minister (Oberst) von";3
+7;"Reynitzsch, W.";
+8;"Nörr (Pfarrer)";1
+9;"Gumpert, K.";
+10;"Sessler, P.";
+11;"Ott, A.";
+12;"Greiner, Josef (Lehrer)";2
+15;"Hörmann, K. (NHG Nürnberg)";
+16;"Popp, Chr.";
+17;"NHG Nürnberg";
+19;"Hornung, W.";
+20;"Wünsch, E. (Oberwerkmeister, LfD)";14
+21;"Frank, M.";
+22;"Ziegler, F.";
+23;"Enderlein, M.";
+24;"Eye, A. v.";
+25;"Vollrath, F.";
+26;"Kuttler, P. (Forstassessor)";4
+31;"Bersu, G.";
+32;"Paret, O.";
+33;"Zingeler, K. Th.";
+36;"Sautter, Friedrich (Kaufmann)";17
+37;"Dorn, Johannes (Landwirt)";5
+38;"Sixt, G.";
+39;"Zeller (Oberstudienrat)";2
+40;"Föhr, Johannes v. (Senatspräsident beim Oberlandesgericht)";8
+42;"Striebel, J.";
+43;"Paulus, E. (d. Ä. o. d. J.)";
+44;"Bechtner (Revierförster)";4
+45;"Schaller (Hauptlehrer)";2
+47;"Schumacher, K.";
+48;"Wagner, E.";14
+49;"Wilhelmi, K.";
+50;"Baumann, K.";
+51;"Mannheimer Altertumsverein";
+52;"Mayer";
+53;"Frickhinger, E. (Dr., Pharmazierat)";7
+54;"Fischer, F. (Oberlehrer)";2
+59;"Rupp, H. (Fachlehrer)";2
+63;"Schöppler";
+70;"Miller, K.";
+71;"Aberle, Michael (Baumwart, Sölflingen)";4
+72;"Blendinger (Lehrer)";2
+73;"Eulenstein (Baurat)";6
+74;"Schöppler, G.";
+75;"Weiblen (Lehrer)";2
+76;"Walz (Prof.)";2
+77;"Veeck";
+78;"Stoll, H.";
+80;"Mayenfisch, v. (Kammerherr)";13
+81;"Weber, Fr.";
+86;"Haßler, G.";
+90;"Pickel, I.";
+91;"Freyberg, von";12
+92;"Roth, M.";
+93;"Redenbacher, M. (Dekan)";1
+94;"Redenbacher, F. K.";
+95;"Fugger (Lehrer)";2
+97;"Erhard, O. (Pfarrer)";1
+98;"Voigt (Apotheker)";7
+99;"Hock, G.";
+100;"Schönweiß, W.";
+102;"Bernett (Dr.) (NHG Nürnberg)";
+103;"Buscher (Pfarrer)";1
+104;"Müller, H.";
+105;"Oetter sen. (Konsistorialrat)";1
+106;"Oetter jun.";
+107;"Bruckmann, P. (Landwirt)";5
+109;"Götz (Seminarinspektor)";1
+111;"Böhm, J.";
+112;"Wunder, L. (NHG Nürnberg, Hist. Ver. Württ. Franken)";
+113;"Wunder, J. (NHG Nürnberg)";
+114;"Gebhardt, A.";
+115;"Heilmann (Landrichter)";8
+116;"Mehlis, C. (NHG Nürnberg)";
+117;"Scheidemandel, H. (NHG Nürnberg)";
+118;"Baumüller, B. (NHG Nürnberg)";
+119;"Ehrngruber, H. W.";
+120;"Stöhr, A. (NHG Nürnberg)";
+121;"Göbel, J. (NHG Nürnberg)";
+122;"Gries, F. (NHG Nürnberg)";
+124;"Jegel, L.";
+125;"Birkner, F.";
+127;"Ellinger, P.";
+128;"Hornung, Hermann (Studienprofessor, NHG Nürnberg)";2
+129;"Reuter, G. (Rektor)";2
+130;"Herold, Rudolf (Dr., Pfarrer)";1
+131;"Auer, W. (NHG Nürnberg)";
+133;"Crailsheim, Freiherr v. (Forstkommissar)";4
+134;"Manglkammer, G.";
+135;"Erl, R. (NHG Nürnberg)";
+136;"Klingsohr (Landrichter)";8
+137;"Dollacker, A.";
+138;"Popp, D.";
+139;"Zottmaier, J. B.";
+140;"Döppel, G.";
+141;"Melzl (Forstkommissär)";4
+142;"Benz (Forstassessor)";4
+144;"Klemm (Dekan)";1
+148;"Schrader";
+149;"Gertis (Hauptlehrer)";2
+150;"Hertlein";
+151;"Gottschick (Forstmeister)";7
+152;"Ow, Freiherr v.";12
+153;"Ohlenroth, L.";
+154;"AK Vor- und Frühgeschichte Augsburg";
+155;"Eckert (Präparator)";14
+156;"Hölder, v. (Dr., Obermedizinalrat)";15
+160;"Kolb (Dekan)";1
+162;"Reutlinger Altertumsverein";
+164;"Aich (Pfarrer)";1
+165;"Jungwirth, H.";
+166;"Maurer, J. (LfD)";14
+167;"Naue, J.";
+168;"Thenn, Th.";
+169;"Mayer, F. A.";
+170;"Brembs (Forstinspektor)";4
+171;"Schumacher (Forstmeister)";4
+172;"Aurbach, J.";
+173;"Schmid, J. (Anthropologe, Schneidermeister, Totengräber)";
+174;"Kellermann (Gebrüder)";
+178;"Fraas, E.";
+179;"Eisenlohr (Reutlinger Geschichtsverein)";
+182;"Bleibimhaus (Forstinspektor)";4
+183;"Helmle (Forstmeister)";4
+192;"Steinmetz, G.";
+193;"Groh (Gendarmeriekommandant)";9
+194;"Hoffmann, I. A.";
+195;"Walderdorff, H. Graf von";12
+196;"Schwemmer (Eisenbahningenieur)";6
+197;"Filchner (Revierförster)";4
+198;"Straßner, W.";
+199;"Hösch, H.";
+200;"Wagner, H.";
+201;"Herlitz, M.";
+202;"Werner, G. (Steinhauer)";10
+203;"Historischer Verein Neumarkt";
+204;"Lutter (Bauer)";5
+205;"Speier (Apotheker)";7
+206;"Scharf, C. (Drogist)";7
+207;"Hayn, J. (Gerichtsvollzieher)";8
+208;"Groll, Th. (Historischer Verein Neumarkt)";
+209;"Klier (Organist)";1
+210;"Gottschalk (Pfarrer)";1
+211;"Weidner (Rechtsanwalt)";8
+212;"Megerer, P.";
+214;"Schäfer (Geometer)";6
+215;"Gminder, E.";
+216;"Dehoff (Grenzkontrolleur)";9
+217;"Schaetzler, Baron von";12
+218;"Trinkl, H.";
+221;"Freudenreich, J. G.";
+222;"Buzorini, M.";
+223;"Gaus, Eugen (Prof., Reallehrer)";2
+224;"Hedinger, August (Dr., Medizinalrat)";15
+225;"Steinhart, H. (Oberamtspfleger, Ellwangen)";1
+226;"Goessler, P.";14
+232;"Dauber, A.";
+233;"Baur, J. (Pfarrer)";1
+234;"Flacho, C.";
+235;"Museum Kaufbeuren";
+236;"Hist. Ver. Neu-Ulm";
+237;"Hist. Ver. Regensburg";
+239;"Nagel, A.";
+245;"Wetzel (Lehrer)";2
+246;"Hager (Schultheiss)";13
+247;"Deufel (Pfarrverweser)";1
+254;"Dorner (Rektor)";2
+255;"Michahelles";
+256;"Zschichang (Bausekretär)";6
+257;"Ilg (Pfarrer)";1
+260;"Hundt, M.";
+261;"Rück, D.";
+262;"Fink, G.";
+263;"Pichler, O. (Pfarrer)";1
+264;"Kapff, E.";
+265;"Brüsselle-Schaubeck, Frhr. v.";12
+266;"Hermann (Oberlehrer)";2
+268;"Huber, W. (LfD)";14
+269;"Neidhart, M.";
+270;"Stark, B.";
+271;"Ulrich, J.";
+272;"Mayer, F. X. (Pfarrer in Pondorf)";2
+273;"Witscher, A.";
+274;"Haldenwang, v. (Hauptmann)";3
+275;"Stählin (Hauptmann)";3
+277;"Knarr, F.";
+278;"Streit, W.";
+279;"Übelacker, L.";
+280;"Vogel, Chr.";
+281;"Huber, Dr. (NHG Nürnberg)";
+282;"Schlenk, G.";
+284;"Oetinger (Pfarrer)";1
+286;"Mayer (Pfarrer)";1
+287;"Brumann, F. (Kaserneninspektor)";3
+288;"Durner, N.";
+290;"Guppenberger, K.";
+291;"Wagner, F. (Prähistorische Staatssammlung)";14
+292;"Haxthausen, E. v.";12
+293;"Broili, J.";
+294;"Henlein, v.";12
+295;"Lang, F. J. (Komm. Rat)";
+299;"Tscherning (Forstmeister)";4
+300;"Zenetti, P.";
+301;"Hist. Verein Dillingen";
+302;"Hofmeister, F.";
+303;"Gaßner (Prof.)";2
+307;"Leiner, L.";
+308;"Strehle (Revierförster)";4
+309;"Keim, E. (Generalmajor)";3
+310;"Rest, W.";
+311;"Väth (Lehrer)";2
+312;"Schmitt, F. J.";
+313;"Altefeld";
+314;"Daschner";
+315;"Rückert";
+316;"Reinhard (Lehrer)";2
+317;"Fremd";
+319;"Hofmann";
+320;"Höhn, J.";
+321;"Höhn, P.";
+322;"Freund (Präparator)";14
+323;"Wilke, Dr. G. (Pfarrer)";1
+324;"Pezolt (Revierförster)";4
+325;"Sander, A. v.";12
+326;"Virchow, H. (Dr.)";
+327;"Emmerich";
+328;"Endrich, P. (Prof.)";2
+329;"Castell, Wolfgang Graf zu";12
+330;"Sandberger (Prof.)";2
+331;"Spiegel, K. (Lehrer)";2
+332;"Thüngen, H. v.";12
+333;"Lockner";
+334;"Wiedersheim (Dr.)";
+335;"Hist. Ver. Unterfranken";
+336;"Conrady, W.";
+337;"Nunn, L. (Lehrer)";2
+338;"Schmitt, J. C. (Dr.)";
+339;"Zeitler (Pfarrer)";1
+340;"Institut f. Ur- u. Frühgesch. Freiburg";
+341;"Knittel (Pfarrer)";1
+342;"Schliz, Alfred (Arzt)";15
+343;"Kost, E.";
+344;"Schiek";
+345;"Üxküll, v. (Oberförster)";4
+346;"Gaßner (Förster)";4
+349;"Volz (Forstmeister)";4
+351;"Maier, E.";
+352;"Hist. Ver. Heilbronn";
+353;"Titot";
+355;"Forrer";
+356;"Menzel, W.";
+357;"Dürrich (Oberleutnant)";3
+358;"Staudacher (Oberförster)";4
+364;"Moog, F.";
+365;"Brengartner (Pfarrer)";1
+366;"Urgesch. Inst. Tübingen";
+367;"Peter, A.";
+371;"Stahl, E.";
+372;"Wanner";
+373;"Klopffleisch";
+374;"Recknagel (Pfarrer)";1
+375;"Bechstein";
+376;"Rost, L.";
+377;"Krapf, H. J. G.";
+378;"Wild, I. V. (Kaplan)";1
+379;"Siegel";
+380;"Stanzinger (Pfarrer)";1
+381;"Wüstenfeld, H. (stud. chem. bzw. Dr.)";6
+382;"Schleyer, M. (Bürgermeister)";13
+383;"Jacobi (Oberförster)";4
+384;"Hubrich (Dr.)";
+385;"Warmuth (Bauer)";5
+386;"Gudden (Dir. Dr.)";
+387;"Röder (Kaplan)";1
+388;"Bibra, v.";12
+389;"Hertel, V. (Direktionsrat Dr.)";
+390;"Schmitt, H. (Direktionsrat)";
+392;"Vierengel (Lehrer)";2
+393;"Schrant (Kaufmann)";17
+394;"Mangold (Oberförster)";4
+397;"Fleck (Förster)";4
+399;"Pieverling, v.";12
+400;"Haffner (Stadtarchivar)";16
+401;"Leutner (Oberlehrer)";2
+404;"Schmoller (Prof.)";
+405;"Thrän";
+406;"Erlenmeyer";
+407;"Ulmer Altertumsverein";
+408;"Seeh (Glaser)";10
+409;"Matt (Bürgermeister)";13
+410;"Reck (Major)";3
+414;"Burkhardt (Oberpräzeptor)";2
+415;"Weisert (Baumeister)";6
+416;"Schwarz (Gärtner)";10
+417;"Tessin, v. (Freiherr)";12
+418;"Flesch (Dr. [Arzt])";15
+419;"Öhrlein, S. (Landwirt)";5
+420;"Grätz";
+421;"Jordan, K. (Gutsbesitzer)";11
+422;"Seifert";
+423;"Jakob (Dr.)";
+424;"Giggelberger (Dr.)";
+425;"Hartmann, J. G. (Pfarrer)";1
+426;"Schärr, von der  (Fähnrich)";3
+427;"Nenninger, F. J. (Dekan)";1
+428;"Ganzenmüller (Lehrer)";2
+429;"Archäologische Arbeitsgruppe Rhön-Grabfeld";
+430;"Stuhlfauth, A.";
+431;"Seyler, E.";
+432;"Pollinger, J. (Hist. Ver. Ndb., aus Landshut)";
+434;"Storch (Rentamtmann)";13
+435;"Ertle, J.";
+436;"Denzel, A.";
+437;"Freitag (Hauptlehrer)";2
+438;"Heim, J. (Dr., Lehrer)";2
+439;"Ritzler, M. (Lehrer)";2
+440;"Titze, W. (Präparaotr, LfD)";14
+442;"Schäuble, L. (Pfarrer)";1
+447;"Defay, H.";
+449;"Miller, G.";
+456;"Bassenheim, Graf von";12
+457;"Eitenbenz, J. A. (Pfarrer)";1
+458;"Edelmann, Hieronymus (Apotheker)";7
+459;"Hist. Ver. Schwaben u. Neuburg";
+462;"Fischer, E.";
+463;"Schreiber, H.";
+464;"Altertumsverein Donaueschingen";
+465;"Mayer, C. F.";
+466;"Wölfle (Pfarrer)";1
+467;"Großmann (Bezirksarzt)";15
+468;"Großmann, Jr.";
+471;"Potschigmann (Ing.)";6
+472;"Eberl, B.";
+473;"Goeringer, H. (Hauptmann, Major)";3
+474;"Haselbeck (Pfarrer, Hist. Ver. f. Ndb.)";1
+475;"Neubauer, H.";
+476;"Kienle, v. (Leutnant)";
+477;"Kandler, J.";
+478;"Hofmeister (Förster)";4
+479;"Hist. Ver. Niederbayern";
+480;"Schmid (Forstmeister)";4
+481;"Spanfehlner, J. (Hist. Ver. Ndb.)";
+482;"Merhart, G. v.";14
+483;"Brand (Pfarrer, aus Erlach)";1
+484;"Krumm (Schreiner, aus Heft bei Aidenbach)";10
+485;"Spirkner";
+486;"Pigenot, v. (Passau, Kreisbaurat)";13
+487;"Kambli, C. (Pfarrkirchen; Buchdruckereibesitzer)";17
+488;"Lößl, V. (Pfarrkirchen; Hauptlehrer)";2
+489;"Faist (Birnbach, Hofwirt, Baumeister)";5
+490;"Walke, N.";
+492;"Ver. f. Kunst u. Altertum Ulm";
+493;"Aichele (Pfarrer)";1
+495;"Diehl (Hauptmann)";3
+496;"Leube (Dr.)";
+497;"Kuppinger (Pfarrer)";1
+498;"Seubert, v. (Major)";3
+499;"Ganzhorn, W.";
+500;"Buchauer Altertumsverein";
+501;"Haas, N.";
+502;"Heller, J.";
+503;"Hermann, L.";
+504;"Reinsch, P.";
+505;"Oesterreicher, A.";
+506;"Hermann";
+507;"Imhof";
+508;"Engelhardt, J.";
+509;"Köberlin";
+510;"Hoffmann, L.";
+511;"Wonsees";
+512;"Fischer, J. B.";
+513;"Streit, v.";12
+514;"Hagen, E. C.";
+515;"Baer, C.";
+516;"Verein Bayreuth";
+517;"Schildhauer";
+518;"Münster, Graf G. zu";12
+519;"Räbel, H. (Prof. Dr., Forchheim)";2
+520;"Födisch, H.";
+521;"Panzer, F.";
+522;"Peter, C. Th.";
+524;"Florschütz";
+525;"Höfler";
+526;"Künssberg";
+527;"Küchenhoff";
+528;"Hist. Ver. Oberfranken";
+529;"Schmauß";
+530;"Hundt, H.";
+531;"Schlund";
+532;"Kirchner";
+533;"Martin";
+534;"Gümbel, C. W. v.";12
+535;"Klopper, W. (Forstmeister)";4
+536;"Reinecke, P.";
+537;"Aufseß, H. Frh. v. u. z.";12
+538;"Hübsch, K.";
+539;"Lutz";
+540;"Künneth, M. J. Th.";
+541;"Zedler";
+542;"Limmer, F.";
+543;"Goldfuß, G. A.";
+544;"Bingel, C.";
+545;"Geyer, W.";
+546;"Anthrop. Ver. Coburg";
+547;"Zauch";
+548;"Voigtel";
+549;"Rädlein, G.";
+550;"Möller, J.";
+551;"Lotz, G.";
+552;"Braun";
+553;"Müller, J.";
+554;"Egloffstein, Frhr. v.";12
+555;"Kaupert, J. M.";
+556;"Schmidt";
+557;"Stumpf";
+558;"Wehrfritz";
+559;"Stadelmann, W.";
+560;"Giech, K. Graf v.";12
+561;"Kraus, K.";
+562;"Roßbach, G.";
+563;"Hinzler, H.";
+564;"Paulsen, R. [oder P.]";
+565;"Badum, Ph.";
+566;"Ranke, J.";
+567;"Zapf, L.";
+568;"Arch. Ver. Günzburg";
+570;"Caron du Val (Patrimonialrichter)";8
+571;"Niederer (Pfarrer)";1
+572;"Waldburg-Zeil, Fürst von";12
+573;"Miller";
+574;"Eith";
+575;"Binder";
+576;"Breeg, H.";
+577;"Spannagel (Revierförster)";4
+579;"Riedlinger Altertumsverein";
+580;"Riek, G.";
+583;"Fribolin";
+584;"Vojkffy, C. (Graf)";12
+585;"Fraas, O.";
+586;"Hülle";
+587;"Schmidt (Pfarrer)";1
+588;"Richter, J.";
+589;"Rad, A. v. (Dr.)";
+590;"Vanotti";
+591;"Dittus (Baurat)";6
+592;"Albrecht (Herzog)";12
+593;"Kley";
+594;"Bittel";
+595;"Heidenheimer Altertumsverein";
+596;"Schinzinger (Oberförster)";4
+597;"Mattes, W.";
+598;"Hammer, Wilhelm (Dr., Hofrat)";
+599;"Hist. Ver. Ludwigsburg";
+600;"Altertümersammlung Stuttgart";
+601;"Wepfer (Hauptmann)";3
+602;"Mayer (Prof.)";2
+603;"Weigel (Dr.)";
+604;"Scheuthle (Lehrer)";2
+605;"Schips (Pfarrer)";1
+606;"Gfröreis (Lehrer)";2
+607;"Wunderlich";
+608;"Mandelslohe (Graf)";12
+609;"Weyermann";
+610;"Beyttenmüller";
+611;"Uracher Altertumsverein";
+612;"Rottweiler Altertumsverein";
+613;"Betz (Pfarrer)";1
+614;"Bauer [oder Beier] (Forstmeister)";4
+615;"Cohausen";
+616;"Jaumann, I. v.";12
+617;"Eisele (Rektor)";2
+618;"Christ, W.";
+619;"Bader, Franz";
+620;"Unold, J. Fr.";
+621;"Stechele (Lehrer)";2
+622;"Steier, Dr. August (Gymnasiallehrer)";2
+623;"Lippus (Pfarrer)";1
+624;"Haug (Lehrer)";2
+625;"Ströbel (Dr.)";
+626;"Badmer (Honighändler)";10
+627;"Bode, F.";
+628;"Hist. Ver. Miesbach";
+629;"Knabl, S. (Pfarrer)";1
+630;"Gandtner";
+631;"Gareis, C. (Forstmeister)";4
+632;"Wenzl, J. (Gymnasialprofessor)";2
+633;"Holzhey, K. (Prof.)";2
+634;"Mittermaier (Landrat)";13
+635;"Müller, F.";
+636;"Hist. Ver. Oberbayern";
+637;"Hartmann, Fr. S. (Gerichtsschreiber)";8
+639;"Hist. Ver. Ingolstadt";
+640;"Frank (Kurat)";1
+641;"Staatsslg. München";
+642;"Lohr, O.";
+643;"Hist. Ver. Schrobenhausen";
+644;"Reichsarbeitsdienst";
+645;"Boxler (Landrichter)";8
+646;"Wille (Lehrer)";2
+647;"Mettingh, Frhr. v.";12
+648;"Arnold";
+649;"Hist. Ver. Chiemgau";
+650;"Dietl, H.";
+651;"Hefner, V.";
+652;"Schmid, A.";
+653;"Wahle, E.";14
+654;"Zehnter (Landgerichtspräsident)";8
+655;"Seubert, M. (Mannherimer Altertumsverein)";
+656;"Wurz, J. (Mannheimer Altertumsverein)";
+657;"Rach, Eduard (Gymnalisaldirektor)";2
+658;"Weick, E.";
+659;"Buscher (Prof., Düsseldorf)";2
+660;"Eck (Gemeinderat, Poppenhausen)";13
+661;"Steidel (Oberförster)";4
+662;"Calwer (Dr.)";
+663;"Colbas (lothringischer Abbé)";1
+664;"Albrecht (Domänendirektor)";11
+665;"Mundorff (Schlutheiß, Jagstfeld)";13
+666;"Münchner Inst. f. Vor- u. Frühgesch.";
+667;"Kepler (Oberlehrer)";2
+668;"Halm (Bezirksförster)";4
+669;"Wilhelm (Bezirksarzt)";15
+670;"Hochstetter (Kaufmann)";17
+671;"Gayler (Archidiakon, Prof., Reutlingen)";1
+672;"Schlenker, Karl (Pfarrer)";1
+673;"Sörgel, W.";
+674;"Übelhack, K. (Bauer)";5
+675;"Dürrwaechter (Prof.)";2
+676;"Alberti, v. (Salinendirektor)";17
+677;"Hanner (Hauptlehrer)";2
+678;"Flad (Lehrer, Steinhilben)";2
+679;"Autenrieth";
+680;"Kersten, Walther";
+681;"Lang, Adolf (Museumsleiter)";14
+682;"Schneider, K.";
+683;"Museum Aschaffenburg";
+684;"Faust, U.";
+685;"Dannheimer, W.";
+686;"Dannheimer, H.";
+688;"Haas (Landgerichtsassessor)";8
+689;"Fischer (Pfarrer)";1
+692;"Wagner (Lehrer)";2
+693;"Geyr von Schweppenburg, Max Freiherr";12
+694;"Pfizenmaier (Forstmeister)";4
+695;"Wiesend, Georg (Bezirksamtmann";13
+696;"Remond (Stadtbergen; Revierförster)";4
+697;"Keim, P. (cand. chem.)";7
+698;"Brückner, v. (Generalmajor)";3
+699;"Fickler (Donaueschingen)";0
+700;"Schellenberg, Hans von";12
+701;"Homberger (Prof., Karlsruhe)";2
+702;"Haaf, M. (Architekt)";6
+703;"Hotz, Joseph (Landwirt, Vilsingen)";5
+704;"Baur (oder Bauer), Jacob (Landwirt, Engelswies)";5
+705;"Hövel, Hermann v. (Straßenbauingenieur)";6
+706;"Metzger (Oberförster)";4
+707;"Bonnet, A.";0
+708;"Schumacher";0
+709;"Mentzingen, v. (Freiherr)";12
+710;"Lori, M. v. (Hofrat)";0

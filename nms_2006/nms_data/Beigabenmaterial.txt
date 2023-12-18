@@ -1,0 +1,5 @@
+"Beigabenmaterialnummer";"Beigabenmaterial"
+1;"Keramik"
+2;"Metall"
+3;"Komplexobjekt"
+4;"Sonstiges"

@@ -1,0 +1,6 @@
+"Erhaltungsnummer";"Erhaltung"
+1;"Gut"
+2;"Befriedigend"
+3;"Schlecht"
+4;"Nicht erhalten"
+5;"Unbekannt"

@@ -1,0 +1,6 @@
+"Körperbestattungslagenummer";"Körperbestattungslage"
+1;"Rückenlage"
+2;"Seitenlage"
+3;"Bauchlage"
+4;"Hocker"
+5;"Unbekannt"

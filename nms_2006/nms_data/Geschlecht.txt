@@ -1,0 +1,4 @@
+"Geschlechtsnummer";"Geschlecht"
+1;"Weiblich"
+2;"Unbestimmt"
+3;"Männlich"
