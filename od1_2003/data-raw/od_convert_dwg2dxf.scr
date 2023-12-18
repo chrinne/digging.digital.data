@@ -1,0 +1,618 @@
+;; Script file for AutoCAD
+;; Start AutoCAD on the command line with option: /b script-file.scr"
+_open
+ODS1P101.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P102.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P103.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P106.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P107.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P204.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P205.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P308.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P309.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P311.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P410.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P512.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P513.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P517.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P614.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P615.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P616.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P618.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P619.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P120.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P121.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P125.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P126.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P222.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P223.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P224.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P227.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P228.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P429.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P439.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P530.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P531.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P636.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P637.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P642.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P734.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P741.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS2P835.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS3P385.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P152.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P153.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P154.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P155.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P156.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P157.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P158.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P259.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P260.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P261.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P262.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P263.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P267.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P275.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P277.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P364.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P365.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P366.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P376.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P468.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P469.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P470.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P571.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P572.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P573.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P632.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P633.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P634.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P638.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P840.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS4P874.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P178.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P179.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P246.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P286.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P287.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P290.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P343.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P395.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P398.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P399.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P444.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P492.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5P691.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS5PX45.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P180.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P182.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P183.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P184.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P281.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P288.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P289.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P293.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P394.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P396.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS7P397.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS10P147.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS12P148.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS12P150.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS12P249.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS12PX51.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P1109.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P1110.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P1113.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P1114.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P1115.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P2106.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P2107.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P2108.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P2111.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P2112.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P2116.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P3117.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P3118.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P3119.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P4120.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P4121.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P4122.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P5124.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P6123.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS3P6125.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS5P2100.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS5P3101.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS5P3102.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS5P4103.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS5P4104.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P1141.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P1142.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P1143.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P1149.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P2144.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P2145.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P3146.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P3150.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P4147.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P4151.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P5148.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P5152.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS6P6153.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS7P8105.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P1126.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P1127.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P1128.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P1136.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P3129.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P3130.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P3131.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P3137.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P3138.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P4132.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P4133.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P4134.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P4139.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P5135.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+OS8P5140.DWG
+(load "do_this.lsp")
+(command "_close" "_y")

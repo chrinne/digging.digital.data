@@ -1,0 +1,657 @@
+--- 
+title: "CAD-Dokumentation zu GIS mit SpatiaLite migrieren"
+subtitle: "Spätneolithisches Kollektivgrab Odagsen 1"
+author: "Christoph Rinne^[Institute for Pre- and Proto History - Kiel University, crinne@ufg.uni-kiel.de]"
+date: "`r format(Sys.time(), '%d. %B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    number_sections: true
+    code_folding: show
+license: GNU General Public License v3.0
+lang: de-DE
+description: Transfer excavation plans from CAD files into a GIS for the re-utilisation of as much data as possible for spatial statistics. 
+---
+
+# Summary {-}
+
+The text describes the transfer of excavation plans from CAD files into a GIS for the re-utilisation of as much data as possible for spatial statistics. The starting point is the retro-digitisation (2D) of a paper based documentation of a four-year excavation of the late Neolithic collective burial Odagsen 1, Einbeck, Northeim. This is not about a nice, interactive plan in a GIS. The text originates from courses in computational archaeology held in Kiel at the  Institute of Pre- and Protohistoric Archaeology. 
+
+This case consists of many DWG files with specific, but also very widespread problems in CAD, including the incorrectly declared metric unit, hatching as an information carrier etc. The following programming languages are used in their respective software environments: **LISP**, **DOS commands**, **R** and **SQL**. 
+
+Data source: C. Rinne, [suppl. to] Rinne, Christoph: Odagsen und Großenrode, Ldkr. Northeim. Jungsteinzeitliche Kollektivgräber im südlichen Leinetal, Rahden/Westf. 2003. DOI: https://doi.org/10.11588/data/2YXWBC.
+
+The obtained data was used for the following lecture in 2019: 
+
+Sara Schiesberg, Christoph Rinne: Knochen - Teilverband - Skelett. Neue Untersuchungsergebnisse und interkulturell vergleichende Überlegungen zum Totenritual kollektiv bestattender Populationen. In: Sektion der Arbeitsgemeinschaft Neolithikum und der Arbeitsgemeinschaft Theorien in der Archäologie e.V. (AG TidA e.V.) auf der Tagung des West- und Süddeutschen Verbandes für Altertumsforschung (WSVA) und des Mittel- und Ostdeutschen Verbandes für Altertumsforschung (MOVA) in Würzburg 2019.
+
+The first part provides scripts to load all DWG files in a folder into AutoCAD, perform some customisations and transformations and export each file to a DXF file. In addition, you will find a script to export all layers of a comprehensive DWG file into individual DXF files. In the second part, SpatiaLite is used to import all DXF files and fix typical problems from this transfer, e.g. malformed geometries, unclosed polygons etc. The comments in the code chunks are in English.
+
+# Vorwort {-}
+
+Ziel ist die Überführung von Ausgrabungsplänen aus CAD-Dateien in ein GIS. Ausgang ist die  Retrodigitalisierung (2D) einer Papierdokumentation einer über vier Jahre erfolgten Ausgrabung des spätneolithischen Kollektivgrabes Odagsen 1, Stadt Einbeck, Ldkr. Northeim. Hierbei geht es nicht um einen schönen, interaktiven Plan in einem GIS am Ende, sondern um die Nachnutzung möglichst vieler Daten für eine räumliche Statistik. 
+
+Dieser Fall besteht aus vielen DWG-Dateien mit spezifischen, aber auch sehr weit verbreiteten Problemen in CAD, u.a. der falsch deklarierten metrischen Einheit, Schraffuren als Informationsträger etc. Die folgenden Programmiersprachen werden in ihrem jeweiligen Softwareumfeld angewendet: **LISP**, **DOS-Befehle**, **R** und **SQL**.  
+
+Datengrundlage: C. Rinne, [Ergänzungsmaterial zu] Rinne, Christoph: Odagsen und Großenrode, Ldkr. Northeim. Jungsteinzeitliche Kollektivgräber im südlichen Leinetal, Rahden/Westf. 2003. DOI: https://doi.org/10.11588/data/2YXWBC.
+
+Die rückwirkend gewonnenen Daten wurden 2019 für folgenden Vortrag verwendet: 
+
+Sara Schiesberg, Christoph Rinne: Knochen - Teilverband - Skelett. Neue Untersuchungsergebnisse und interkulturell vergleichende Überlegungen zum Totenritual kollektiv bestattender Populationen. In: Sektion der Arbeitsgemeinschaft Neolithikum und der Arbeitsgemeinschaft Theorien in der Archäologie e.V. (AG TidA e.V.) auf der Tagung des West- und Süddeutschen Verbandes für Altertumsforschung (WSVA) und des Mittel- und Ostdeutschen Verbandes für Altertumsforschung (MOVA) in Würzburg 2019. Themen: Ripley's K cross zu verbrannten Knochen, Holzkohle und gebranntem Lehm zum Zusammenhang von Brandstellen und verbrannten Knochen bzw. Leichenbrand. Zudem wurden bei den Polygonen der Knochenlayer die Größe, die Form und die Ausrichtung der Plygone als Schätzparameter für eine Bestimmung als Schädel/Becken, Langknochen und indet. genutzt und weitere Lagebezüge analysiert. 
+
+**Anmerkungen** 
+
+ - Menüpfade oder Abfolgen von Fenstern werden mit schlichten Pfeilen dargestellt: "Datei > Speichern". 
+ - Tastaturkürzel, die ich gerne Nutze, stehen in Spitzklammern je Taste: \<strg> + \<c>. 
+ - Schalter auf Formularen werden in [] gesetzt: [OK] 
+ - Zur Darstellung von Befehlen im Text nutze ich die in Markdown übliche Darstellung von Code oder eben Anweisungen an den Computer: ```anweisung```. 
+ - SQL-Anweisungen sind nicht in Großbuchstaben gesetzt, dank der farblichen Gestaltung ist dies überflüssig. Eine Ausnahme bilden die verwendeten Funktionen, bei denen der *CamelCase* für die bessere Lesbarkeit beibehalten wird. Auch wird der Anfang einer  Anweisung jeweils großgeschrieben, um aufeinander folgende Anweisungen etwas besser zu trennen. Im vorliegenden Fall wurden Leerzeichen in Objektnamen vermieden, dadurch müssen Tabellen und Feldnamen nicht in "" stehen.
+
+```{r knitr global options}
+# Global options for knitr
+knitr::opts_chunk$set(echo=TRUE, include=TRUE, fig.align="center")
+```
+
+```{r Install required packages and load}
+# Install required packages
+require(pacman) || install.packages("pacman")
+pacman::p_load(DT, knitr, RSQLite)
+```
+
+```{r R-script-load-library-setup-connection}
+od1db<-dbConnect(RSQLite::SQLite(), dbname = "./data/Odagsen1.sqlite")
+```
+
+```{R basic clean up in the db, include=FALSE}
+dbExecute(od1db, "Drop table if exists block_line_2d;")
+dbExecute(od1db, "Drop table if exists insline_layer_2d;")
+dbExecute(od1db, "Drop view if exists insline_layer_2d_view;")
+dbExecute(od1db, "Drop table if exists line_layer_2d;")
+dbExecute(od1db, "Drop table if exists polyg_layer_2d;")
+dbExecute(od1db, "Drop table if exists text_layer_2d;")
+```
+
+# Einführung
+
+## Verwendete Software & Informationen
+
+ - OS Windows 10
+ - QGIS 3.22.4-Białowieża Quelle: [https://qgis.org]
+ - SpatiaLite SpatiaLite GUI 2.1.0 beta1, SpatiaLite 5.0.0, SQLite 3.33.0, Quelle [http://www.gaia-gis.it]
+ - AutoCAD 2010, Quelle für eine aktuelle, *kostenlose* Schulversionen:  [https://www.autodesk.de/education/edu-software/overview]
+ 
+ - SpatiaLite Cookbook html [http://www.gaia-gis.it/gaia-sins/spatialite-cookbook/index.html]
+ - SpatiaLite Funktionen [http://www.gaia-gis.it/gaia-sins/spatialite-sql-5.0.0.html] 
+
+AutoCAD ist eine sehr komplexe Software und Ausgrabungen können eine komplexe Struktur annehmen, die es zu dokumentieren gilt. Erwarten Sie nicht, dass die notwendige Kompetenz beim Erstellen der digitalen Daten stets vorhanden war, auch der Autor (Chr. Rinne) ist hier nur Autodidakt. 
+
+Rechnen Sie mit Fehlern im originalen Datenbestand und einer ggf. nicht optimalen Struktur oder erwarten Sie nicht die von Ihnen bevorzugte Struktur. Korrektur von Fehlern und Anpassungen der Struktur erfolgen sicher am besten im originalen Arbeitsumfeld, also CAD.
+
+Neben AutoCAD gibt es teils kostengünstigere Alternativen, die DWG-Dateien ebenfalls lesen können, u.a.:
+
+ - BricsCAD [https://www.bricsys.com]
+ - MegaCAD [https://www.megacad.de/]
+
+## Layer als getrennte DXF-Dateien 
+
+Alle GIS trennen nach Punkt, Linie und Polygon. Die in AutoCAD sehr wichtige inhaltliche Trennung in diverse Layer wird in einem GIS beim Import in der Regel aber in einer Attributspalte wiedergegeben. Es kann für die Archivierung als auch die Nachnutzung von CAD-Dateien sinnvoll sein, jeden Layer in eine eigene DXF-Datei zu exportieren. So werden kleinere Einheiten geschaffen und eventuell vorhandene Fehler eingegrenzt.
+
+Statt Handarbeit empfiehlt sich hierfür eine Programmierung, bei AutoCAD in LISP:
+
+```{bash 'LISP-Script für den Export einzelner Layer.', eval=FALSE, include=TRUE}
+; Create list of layer names.
+; The (not lyr) excludes the current lyr so the next layer is selected
+(setq lyrlst nil)
+(while (setq lyr (tblnext "layer" (not lyr)))
+  ;the keyword for more informations related to the following command is "dotted pairs"
+  (setq lyrlst (cons (cdr (assoc 2 lyr)) lyrlst))
+)
+
+; Select all elements of the lyr and save it to dxf
+(foreach lyr lyrlst
+  (progn ; allows more than one command in the for loop
+    ;switch layer on, thaw and unlock to see and export something when loaded
+	  (command "-layer" "_on" lyr "_thaw" lyr "_unlock" lyr "")
+	  ;select everything from the selected layer
+    (setq ss (ssget "X" (list (cons 8 lyr)))) 
+    (if (> (sslength ss) 0)
+      (progn
+        ;concatenate current file path, filename, "_", layername and extension
+	      (setq pathfile (strcat
+			    (getvar "dwgprefix")
+			    (substr (getvar "dwgname") 1 (- (strlen (getvar "dwgname")) 4))
+			    "_" lyr
+			    ".dxf"
+			    );end strcat
+	      );end setq
+	      ;export selected features as dxf
+	      (command "-wblock" pathfile "" "" "0,0" ss "")
+      );end progn
+    );end if
+  );end progn
+);end for
+```
+
+Das ist eine einfache und ausreichend kommentierte Funktion, also einfach per *copy 'n paste* in den LISP-Editor kopieren und dort ausführen. Den LISP-Editor finden Sie in AutoCAD unter "Extras > AutoLISP > Visual LISP Editor". Mit \<Ctrl> + \<n> öffnen Sie eine neue Datei, fügen den Code dort ein und wählen dann das Icon mit dem roten Pfeil nach unten ("Aktives Bearbeitungsfenster laden"). Der Export erfolgt in das Verzeichnis der aktiven Zeichnung.
+
+Für den Export wird der Befehl ```wblock``` verwendet, da dieser die selektierten Objekte exportiert. Damit lässt sich leider keine Entscheidung über die DXF-Version treffen. Eine Möglichkeit ist das pauschale Ändern des Speicherformates in den Optionen: "Extras > Optionen" Register "Öffnen und Speichern". Der alternative Befehl ```dxfout``` ist keine echte Alternative, da dieser stets den gesamten Dateiinhalt exportiert.
+
+## Originaldaten
+
+### Ausgrabung
+
+Die Daten stammen von der Ausgrabung und Auswertung des spätneolithischen Kollektivgrabes [Ogasen I](https://www.jna.uni-kiel.de/index.php/jna/issue/view/23), Stadt Einbeck, Ldkr. Northeim in Niedersachsen. Die Ausgrabung erfolgte in vier Kampagnen von 1981 bis 1984 als Forschungs- und Lehrgrabung des Institutes für Ur- und Frühgeschichte der Georg-August-Universität in Niedersachsen (@rinneOdagsenUndGrossenrode2003a; @heegeHauserTotenJungsteinzeitliche1989). In diesen Kampagnen  wurden zahlreiche Schnitte und eine wechselnde Anzahl von Plana angelegt als auch die dazwischen ursprünglich belassenen Profilstege sukzessive abgebaut und auf insgesamt 154, meist einzelnen und neu gerichteten Din A3-Blättern im M 1:20 dokumentiert. Zu den jeweiligen Planblättern wurden Überlieger auf Transparentpapier mit Nivellierwerte und weiteren Angaben angefertigt. Die Einmessung erfolgte mit Theodolit, Nivelliergerät und Maßband.
+
+### Digitalisierung in AutoCAD
+
+Die Digitalisierung der Planzeichnungen erfolgte im Mai und Juni 1997 in AutoCAD Ver. 12 (DOS) und Ver. 13 (Windows 3.1) auf einem Din-A3-Grafiktablett und mit Referenzierung anhand der Koordinatenangaben auf den Blättern. Jede Datei erhielt einen stringent vergeben Namen ODS(chnitt)<SchnittNr> P(lanum)<Planumnummer des Blattes> <fortlaufender Zähler>, z.B. ODS1P102. Für jedes Blatt wurde die Angabe zum Planum der Zeichnung,  die Angabe der Ausgräberin zum Planum aus ihrer Aufarbeitung, die Bearbeitungszeit der Digitalisierung und der Mittelwert der angegebenen Nivellierwerte  zum Fixpunkt an der Oberfläche erfasst. Ergänzt wurden nachträglich die gängigen technischen Metadaten der resultierenden Dateien.
+
+```{r 'Table 1 List of drawings and DWG files.', echo=FALSE}
+tab01<-read.table("./data-raw/od_files.txt", header = TRUE, sep = "\t", dec = ",")
+colnames(tab01)<-tolower(colnames(tab01))
+# if output is html table as interactive datatable else table with limit
+DT::datatable(tab01, filter = "top", options=list(pageLength=10), 
+  caption="Liste der Planzeichnungen und erstellten DWG-Dateien.")
+```
+
+Die Dateien sind einfach strukturiert. Folgende Layer wurden für Informationseinheiten verwendet: BEFUND, BEFUND_UNSICHER, BEFUNDSCHRAFF, FEUER, GRABUNGSGRENZE, GRENZE, KNOCHEN, KNOCHENSCHRAFF, STEINE, STEINESCHRAFF, TPROFIL. Alle Linien wurden als 2D-Polygone digitalisiert, allerdings wurden die Polygone wahlweise geschlossen oder wegen der oft dichten Lage von Steinen und Knochen  sauber an den gemeinsamen Knoten gefangen. 
+
+Als Störungen klassifizierte Befunde haben eine horizontale Linienschraffur, Sandsteine erhielten eine Punktschraffur und gebrannte Steine eine diagonale Schraffur auf dem Layer "FEUER", um diese Information zu vermitteln. Knochen wurden ausschließlich für den optischen Effekt stets schraffiert. Die Schraffuren wurden nicht je Objekt, sondern meist für zahlreiche Objekte angelegt, wodurch diese Schraffuren als ein Objekt über mehrere Steine oder Knochen laufen und der Mittelpunkt dieser Schraffur räumlich nicht mit einem Objekt zusammenhängt. Dies trifft vor allem auf Knochen zu, bei den eher singulären Sandsteinen oder im Verbund gebrannten Steinen ist ein räumlicher Kontext des Schraffurmittelpunktes eher gegeben.
+
+Symbole für Holzkohle, Rotlehm und verbrannte Knochen wurden als grafische Blöcke mit den Namen HK, RL, LB eingefügt. Diese können mit dem jeweiligen Datei-, Layer- und Blocknamen als auch den Koordinaten aus allen Zeichnungen eines Ordners in eine Tabelle exportiert werden (s.u. Vorbereitung in AutoCAD).
+
+# Vorbereitung in AutoCAD
+
+Mit einiger Wahrscheinlichkeit müssen die nachfolgenden Aspekte bei der Aufbereitung von AutoCAD-Dateien auf zahlreiche Dateien angewendet werden. Um dies effizienter zu gestalten, können drei Dateien verwendet werden. Die liegen hier alle in dem Ordner der zu editierenden dwg-Dateien, um die Pfadangabe zu vermeiden:
+
+1. Eine batch-Datei (.bat) zum Starten von AutoCAD einschließlich eines Skriptes (.scr). Hier muss der Pfad zur acad.exe an die jeweilige Version angepasst werden.
+2. Eine Skript-Datei (.scr), die nacheinander alle zu editierende Dateien öffnet, eine LISP-Anweisung lädt und die Datei dann auch wieder schließt.
+3. Eine LISP-Datei mit einer Reihe von Abzuarbeitenden Vorgängen.
+
+```{bash 'Starten von AutoCAD mit einem Skript.', eval=FALSE, include=TRUE}
+REM Command to start ACAD with the script to convert all DWG files to DXF
+"c:\Program Files\Autodesk\AutoCAD 2014\acad.exe" /b od_convert_dwg2dxf.scr
+```
+
+Das Skript für AutoCAD öffnet jede genannte DWG-Datei, führt das hinterlegte LISP-Skript "do_this.lsp" aus und schließt die Datei wieder ohne zu speichern. Der Export erfolgt in der LISP-Anweisung. Die Letzte Zeile muss eine **Leerzeile** sein. Sollten Sie in der DWG-Datei Änderungen vornehmen wollen, können Sie dies ebenfalls in der Skript-Datei "do_this.lsp" (s.u.) einbauen. 
+
+```{bash 'Skript zur Konvertierung.', eval=FALSE, include=TRUE}
+;; Script file for AutoCAD
+;; Start AutoCAD on the command line with option: /b script-file.scr"
+_open
+ODS1P101.DWG
+(load "do_this.lsp")
+(command "_close" "_y")
+_open
+ODS1P102.DWG
+...
+(command "_close" "_y")
+<blank line>
+```
+
+Die LISP-Datei führt zahlreiche Änderungen und den Export durch. Die Erläuterungen dazu folgen.
+
+```{bash 'LISP-Anweisungen für den Export', eval=FALSE, include=TRUE}
+; The units will be set to 6 = meter (4 = mm, 5 = cm).
+(command "_insunits" 6)
+
+; Purge the drawing, delete the unused objects
+(command "_purge" "all" "*" "N")
+
+; Zoom to the extend
+(command "_zoom" "_e")
+
+; save the dwg file with the current changes
+(command "_qsave")
+
+; Changes made only for the DXF-Export
+
+; Hatches in AutoCAD might produce problems e.g.:
+;  - hatch combines several objects
+;  - ring handling
+;  - centroid not within the contour. 
+; You might want to explode them to individual lines or dots 
+; to get a standard import process.
+; The filter uses a list of dotted pairs (0 . <objects>) and (8 . <list of layer names>).
+(setq SS (ssget "x" '((0 . "hatch") (8 . "FEUER,KNOCHENSCHRAFF,STEINESCHRAFF"))))
+	(if SS
+	 (progn
+	  (setq CNT 0)
+	  (repeat (sslength SS)
+	   (vl-cmdf "._explode" (ssname SS CNT))
+	   (setq CNT (1+ CNT))
+	  )
+	 )
+)
+
+;; If you want to resolve all the blocks in the drawing on specific layers take previous block but change "hatch" to "insert". 
+;; Please note: 
+;; - Objects will be exploded to the original layer, likely "0".
+;; - Attributes, e.g. numbering, will get lost.
+
+; Export to dxf including the last changes
+ (command "_saveas" "dxf" 16 "")
+)
+```
+
+## Einheiten (INSUNITS)
+
+AutoCAD kennt Einheiten (inch, mm, m etc) und rechnet diese automatisch ineinander um. Die Einheit der Datei wird von Archäologen leider oft ignoriert, so dass DWG-Dateien in der Archäologie zwar in Metern gemessen sind, die Angabe zur Einheit aber auf dem Standard "Millimeter" steht oder bisweilen sogar auf Inch (engl. OS). Dies kann im Export-Skript gleich mit angepasst werden, um die automatische Skalierung um den Faktor 1000 bei einem heterogenen Datenbestand zu vermeiden. Hierbei steht die 6 für "Meter", 5 für "Zentimeter" und 4 für "Millimeter".
+
+Sollten die Zeichnungen darüber hinaus tatsächlich falsch skaliert sein, kann dies in einem Zug mit folgender Befehlsfolge im Script erledigt werden. Die leere Anweisung nach "all" beendet die Objektwahl, "0,0,0" bezeichnet den Ursprung der Skalierung und ".001" ist durch den notwendigen Faktor zu ersetzen. Für die Optik können Sie noch ein "Zoom" "G" (Grenzen) bzw. _e(xtend) ergänzen.
+
+```{bash 'Skript-Befehl für die Skalierung.', eval=FALSE, include=TRUE}
+(command "_scale" "all" "" "0,0,0" ".001"
+(command "_zoom", "_e")
+```
+
+Darüber hinaus könnten bei dieser Gelegenheit nicht verwendete Objekte wie Linientypen, Blöcke etc. aus der Datei gelöscht werden (Bereinigen bzw. _purge). Nach diesen Änderungen wird die Datei gespeichert: ```(command "_qsave")```
+
+## Schraffuren zerlegen
+
+Schraffuren kodieren oft Informationen, sind aber schlecht in ein GIS zu überführen. Werden Schraffuren in die zugehörigen Elemente, z.B. einzelne Linien zerlegt, handelt es sich um den Import einer schlichten Geometrie. In einem GIS kann dann eine räumliche Verbindung (*spatial join*) zwischen den unterschiedlichen Objekten hergestellt werden. Im vorliegenden Fall könnten dann alle Steine mit mindestens einem Linienmittelpunkt vom Layer "FEUER"  als gebrannt markiert werden. Dazu muss vor dem Speichern (*\_saveas*) folgender Code eingefügt werden. 
+
+```{bash 'Skript-Befehl für das Auflösen von Schraffuren.', eval=FALSE, include=TRUE}
+(setq SS (ssget "x" '((0 . "hatch") (8 . "FEUER"))))
+(if SS
+ (progn
+  (setq CNT 0)
+  (repeat (sslength SS)
+   (vl-cmdf "._explode" (ssname SS CNT))
+   (setq CNT (1+ CNT))
+  )
+ )
+)
+<blank line>
+```
+
+Da dies nicht ganz selbsterklärend ist, eine knappe Erläuterung: Die erste Zeile definiert die Variable "ss" [^1] und weist dieser mit ssget aus der gesamten Datei mit "x" alle Objekte zu, die der folgende Liste an Parametern entsprechen (*dotted pairs*, d.h. Attributkennziffer . Wert). Im vorliegenden Beispiel sind das also Objekttyp (0): Schraffur und Layer (8): Feuer. Wenn die Variable "ss" Inhalt hat wird eine Abfolge (*progn*) von Anweisungen durchgeführt: 1. ein Zähler mit dem Startwert "0" definiert und dann auf alle Elemente der Auswahl "ss" der Befehl "*explode*" ausgeführt, wobei der jeweilige Objektname anhand des Zählers ermittelt wird. 
+
+[^1]: Im Internet oft zu finden und vermutlich die Abkürzung für *selection set*.
+
+Der vorangehende Abschnitt kann auch zum Auflösen von Blöcken verwendet werden. Dazu muss "hatch" durch "insert" ersetzt werde. Beachten Sie aber:
+
+ - Blöcke werden auf den ursprünglichen Layer, also vermutlich "0" aufgelöst.
+ - Attribute wie z.B. eine Zählung gehen verloren.
+ 
+Blöcke sollten Sie vorab exportieren (s. Datenextraktion).
+
+## Export in DXF
+
+Am Ende des LISP-Skriptes wird alles in eine DXF-Datei mit 16 Nachkommastellen bei den Koordinaten exportiert. Hierbei wird  unter der Version gespeichert, die in unter "Extras > Optionen" in AutoCAD vorgegeben ist. Wenn Sie den Befehl "_saveas" mal von Hand durchspielen möchten, um die jeweiligen Vorgaben des Systems zu sehen und ggf. nutzen zu wollen geben Sie in der Kommandozeile von AutoCAD folgendes ein: ```(command "_saveas")```. Damit wird der Befehl in der Kommandozeile durchgeführt und in "\<>" steht die jeweilige Vorgabe des benötigten Parameters den Sie einfach mit \<Enter> bestätigen können. Dieses "Enter" wird im Skript einfach mit einer Leerzeile übernommen. Das bedeutet, wenn Sie die automatische Speicherung in ACAD gesetzt haben kommen nach "*\_saveas*" drei leere Zeilen und die Datei steht mit dem Originalnamen jedoch mit .dxf als DXF-Datei im ursprünglichen Verzeichnis.
+
+## Datenextraktion
+
+In AutoCAD können aus einzelnen oder auch vielen Zeichnungen eines Ordners diverse Elemente mit deren Attributen als Liste exportiert werden (*\_dataextraction*). Die Befehlsführung ist weitgehend intuitiv. In den einzelnen Fenstern kann die Auswahl an Elemente und Attribute durch entsprechende Anzeigeoptionen bzw. Filter gesteuert werden. Im Beispiel Odagsen "Nur Blöcke Anzeigen" für die Auswahl von "HK", "LB" und "RL". Dann den Kategorienfilter auf "Allgemein", "Geometrie" und "Zeichnung" setzen, um dann nur die Attribute "Dateiname", "Layer", "Position x", "Position Y" und "Position Z" zu wählen. **Wichtig**: der Export muss wegen der Punkt-Komma-Problematik als CSV-Datei gespeichert werden.
+
+In diesem Fall erkennt der DXF-Import sowohl die Blockdefinitionen als auch die Einfügepunkte und listet diese korrekt auf (s.u.). Eine Datenextraktion ist deshalb nicht notwendig.
+
+# SpatiaLite GUI
+
+Starten Sie die SpatiaLite GUI und erstellen Sie eine neue, leere Datenbank. In diesem Fall werden die vielen DXF-Dateien nicht einzeln, sondern der gesamte Ordner importiert: "Menu > Advanced > Import DXF drawings". Wählen Sie nur eine DXF-Datei aus und ändern Sie im Importfenster dann die Angabe auf "(x) Import any DXF drawing file from selected folder". Da ein lokales Koordinatensystem verwendet wurde belassen Sie SRID auf "-1". Weitere Angaben: "(x) automatic 2D/3D", "(x) mixed layers (distinct by type)", "(X) none" für das *Ring handling* also das Erkennen von sog. Donuts. Nach einer kurzen Wartezeit wurden folgende Tabellen und Sichten erstellt:
+
+- block_line_2d: die Linien der grafischen Blockdefinitionen in jeder Datei.
+- insline_layer_2d: Eine Liste der eingefügten Blöcke in jeder Datei, u.a. mit Datei-, Layer und Blocknamen als auch x, y und z-Koordinate des Einfügepunktes.    
+- insline_layer_2d_view: Die Kombination der beiden vorgenannten Dateien in einer Sicht, die im vorliegenden Fall zwar offensichtlich korrekte Geometrien enthält, in QGIS im Kartenfenster aber dennoch nicht dargestellt wird.
+- line_layer_2d: sehr viele Linien  der diversen Objekte (Steine, Knochen etc.) mit jeweiligem Datei- und Layernamen.
+- polyg_layer_2d: Deutlich weniger Polygone mit jeweiligem Datei- und Layernamen.
+- text_layer_2d: Die Texte in den DXF-Dateien, z.B. Befund und Profilnummern, mit dem zugehörigen Einfügepunkt, Datei- und Layernamen. 
+
+## Datenkontrolle
+
+Es folgt eine Datenkontrolle mit Überarbeitung, die vor allem die Geometrien betrifft. Hier sind teils durch das unsaubere Digitalisieren doppelte Knoten vorhanden oder einige Polygone überschneiden sich selbst. 
+
+### line_layer_2d
+
+Zahlreiche **fehlerhafte Geometrien** können über das Kontextmenü repariert werden:
+Spalte "geometry" Kontextmenü > "Malformed geometries". Liefert 501 fehlerhafte Geometrien: 1. überwiegend wiederholter Knoten (*repeated vertex*), 2. fehlerhafte Geometrie durch zu wenig Punkte. Bestätigen Sie [Repair], um das erste Problem direkt zu lösen. Sollten Sie die Daten prüfen und von Hand korrigieren wollen, dann führen Sie folgende Befehle nacheinander aus.
+
+```{sql 'Überprüfen und korrigieren der Geometrien.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+-- Eine Geometrie mit Fehler zur Kontrolle ansehen
+Select AsText(geometry) from line_layer_2d 
+ where feature_id = 32;
+-- Die Korrektur ansehen
+Select AsText(SanitizeGeometry(geometry)) from line_layer_2d 
+ where feature_id = 32;
+-- Die Korrektur ausführen
+Update line_layer_2d
+ set geometry = SanitizeGeometry(geometry)
+ where IsValid(geometry) = 0;
+```
+
+Es bleiben 78 fehlerhafte Geometrien mit "Repeated vertex. Too few points in geometry ...".  Die Kontrolle der Geometrie von Feature 412 zeigt drei identische Punkte. Verallgemeinernd können wir mit folgender Abfrage diese fehlerhaften erst finden und dann auch löschen:
+
+```{sql 'Fehlerhafte Geometrien: Doppelter Punkt.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+-- Fehlerhafte Linien aus identischen Punkten finden.
+Select * from line_layer_2d
+where ST_Length(geometry) = 0 and IsValid(geometry) <> 1;
+-- Löschen dieser Linien
+Delete from line_layer_2d
+where ST_Length (geometry) = 0 and IsValid(geometry) <> 1;
+```
+
+Weitere Merkmale von möglicherweise fehlerhaften Linien können gesucht und ggf. gelöscht werden: z. B. eine Linie besteht nur aus drei Punkten, wobei Start und Endpunkt identisch sind. 
+```{sql 'Ring mit drei Punkten', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select feature_id, layer, NumPoints(geometry)
+from line_layer_2d
+where StartPoint(geometry) = EndPoint(geometry) and NumPoints(geometry) = 3;
+```
+
+Die Linien könnten allerdings als einfach Linie von Bedeutung sein, deshalb wird nur ein Punkt gelöscht. Anmerkung: die Funktion RemovePoint zählt 0-basiert.
+
+```{sql 'Ring aus 3 Punkten korrigieren.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Update line_layer_2d
+set geometry = RemovePoint(geometry, 2)
+where StartPoint(geometry) = EndPoint(geometry) and NumPoints(geometry) = 3;
+```
+
+Je nach Kontext könnten Linien mit zwei Punkten oder besonders kurze Linien auch weniger plausibel sein. 
+
+Abschließend ein Überblick über den Datenbestand:
+
+```{sql 'Datenbestand in line_layer_2d', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select Count(*), layer, GeometryType(geometry)
+from line_layer_2d
+group by 2, 3;
+```
+
+### poly_layer_2d
+
+Auch hier werden zuerst **fehlerhafte Geometrien** über das Kontextmenü repariert:
+Spalte "geometry" Kontextmenü > "Malformed geometries": Wiederholte Knoten (*repeated vertex*) reparieren. Ringe mit weniger als 4 Punkten entsprechen den Linien mit identischem Start- und Endpunkt (der Endpunkt ist nicht identisch mit, gleicht aber dem Startpunkt). Bestätigen Sie [Repair], um das erste Problem direkt zu lösen. Die zugehörige Funktion ist "ST_MakeValid(geom)". Sollten Sie die weiteren fehlerhaften Daten prüfen und von Hand korrigieren wollen, dann führen Sie folgende Befehle nacheinander aus.
+
+```{sql 'Ringe mit weniger als vier Knoten.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select feature_id, layer, AsText(geometry) 
+from polyg_layer_2d
+where IsValid(geometry) = 0 and ST_NPoints(geometry) < 4;
+-- Löschen mit 
+Delete from polyg_layer_2d
+where IsValid(geometry) = 0 and ST_NPoints(geometry) < 4;
+```
+
+Es bleiben noch die sich überschneidenden Polygone, zur visuellen Kontrolle 
+
+```{sql 'Polygon Überschneidung', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select feature_id, layer, ST_NPoints(geometry), AsText(geometry) 
+from polyg_layer_2d
+where IsValid(geometry) <> 1;
+```
+
+Die Polygone können mit der Funktion "ST_RingsCutAtNodes(geom)" in ein Multilinenobjekt zerteilt werden. Etwas einfacher und eventuell auch erfolgreich ist die Anwendung der Funktion "MakeValid(geometry)" die ein Multipolygon zurückgibt. Um keine gemischten Geometrien zu erhalten, was durch die Prüfroutinen (*trigger*) auch verhindert wird, sollte die Geometrie von polyg_layer_2d vorher angepasst und zu einem Multipolygon verändert werden.
+
+Anmerkung: Durch das Entfernen  der Geometrieinformationen erscheinen die Index-Tabellen aus dem Bereich "Spatial Index" nach einem *refresh* jetzt unter den "User Data". Mit der Wiederherstellung des Index werden diese alten Indices gelöscht.
+
+```{sql 'Multipolygone erstellen und fehlerhafte reparieren.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+-- Prüfroutinen entfernen, die Parameter sind hier Text.
+Select DiscardGeometryColumn('polyg_layer_2d', 'geometry');
+-- Nur die Konvertierung zu Multipolygon und Reparatur ausführen.
+Update polyg_layer_2d
+set geometry = CastToMulti(MakeValid(geometry));
+-- Prüfroutine wieder einrichten, Parameter als Text.
+Select RecoverGeometryColumn('polyg_layer_2d', 'geometry', -1, 'MULTIPOLYGON','XY');
+-- Rückgabewert 1 wenn ok.
+-- Und den Index der Geometrie neu generieren.
+Select CreateSpatialIndex('polyg_layer_2d', 'geometry');
+-- Rückgabewert 1 wenn ok, dennoch zur Kontrolle.
+Select Count(*), GeometryType(geometry), Srid(geometry), CoordDimension(geometry)
+from polyg_layer_2d
+group by 2, 3, 4;
+```
+
+Zur Kontrolle und falls nur einfache Polygone gewünscht sein sollten:
+
+```{sql 'Multipolygone mit mehr als einem Polygon listen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select *, ST_NumGeometries(geometry)
+from polyg_layer_2d
+where ST_NumGeometries(geometry) > 1;
+```
+
+Die Fälle mit genau zwei Subpolygonen können getrennt werden.  
+
+```{sql 'Multipolygone trennen', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+with recursive cnt(x) as 
+ (select 1
+ union all
+ select x+1 from cnt limit 2)
+-- Ende Rekursion
+Select filename, layer, AsText(CastToMulti(ST_GeometryN(geometry, x))) as geometry
+ from cnt,  polyg_layer_2d as b
+  where ST_NumGeometries(b.geometry) = 2; 
+```
+
+Um diese Multipolygone mit genau zwei Subpolygonen getrennt anzufügen muss eine "*insert into*"-Anweisung eingefügt werden. Danach noch die ursprünglichen Polygone löschen und die Tabellen der Datenbank aktualisieren.
+
+```{sql 'Multipolygone trennen und anfügen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+with recursive cnt(x) as 
+ (select 1
+ union all
+ select x+1 from cnt limit 2)
+Insert into  polyg_layer_2d (filename, layer, geometry)
+select filename, layer, CastToMulti(ST_GeometryN(geometry, x)) as geometry 
+ from cnt,  polyg_layer_2d as b
+  where ST_NumGeometries(b.geometry) = 2;
+```
+
+```{sql 'Originale Multipolygone löschen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Delete from polyg_layer_2d
+ where ST_NumGeometries(geometry) = 2;
+```
+
+```{sql 'Tabellen der Datenbank aktualisieren.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select UpdateLayerStatistics();
+```
+  
+Zum Abschluss der Prüfung eine Übersicht zum Datenbestand:
+
+```{sql 'Datenbestand in polyg_layer_2d', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select Count(*), layer, GeometryType(geometry)
+from polyg_layer_2d
+group by 2, 3;
+```
+
+## Linien zu Polygone
+
+Sehr viele Steine und Knochen wurden nicht als Polygone erkannt. Im Folgenden werden möglichst viele Linien, die eigentlich Polygone darstellen sollten in diese konvertiert und in die Tabelle der Polygone verschoben (kopieren & löschen). Bei diesem pauschalen Vorgehen können natürlich Ungenauigkeiten und Fehler entstehen, u.a. erneut sich selbst schneidende Polygone. Je nach Aufwand ist also eine Einzelfallprüfung vorzuziehen. 
+
+### Pauschale Methode
+
+Die Funktion ST_Polygonize aggregiert die Geometrien und versucht dann aus den Linien Polygone zu bilden. Durch das Aggregieren je Datei und Layer werden nachfolgend stets nur die jeweils möglichen räumlichen Bezüge der Linien berücksichtigt. Ergänzend wird eine Liste der jeweils eingehenden "*feature_id*" erstellt (*Group_Concat()*), um die Zugehörigen Linien identifizieren und löschen zu können. Je Datei und Layer wird ein Multipolygon erstellt.
+
+```{sql 'Linien aggregieren und Polygone in eine temporäre Datei schreiben.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Create table tmp_polygonize as
+select filename, layer, Group_Concat(feature_id) as fids,
+ CastToMulti(ST_Polygonize(geometry)) as geometry
+from line_layer_2d
+where layer in ('KNOCHEN', 'STEINE')  
+group by 1, 2;
+```
+
+```{sql 'Geometrie von tmp_polygonize prüfen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select Count(*), GeometryType(geometry), Srid(geometry), CoordDimension(geometry)
+from tmp_polygonize
+group by 2, 3, 4
+```
+
+```{sql 'Wenn nötig fehlerhafte Geometrien in tmp_polygonize löschen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Delete from tmp_polygonize
+where geometry is null
+```
+
+```{sql 'Geometriespalte von tmp_polygonize registrieren.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select RecoverGeometryColumn('tmp_polygonize', 'geometry', -1, 'MULTIPOLYGON', 'XY')
+
+```{sql 'Index von tmp_polygonize erstellen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select CreateSpatialIndex('tmp_polygonize', 'geometry');
+```
+
+Im nächsten Schritt werden die zahlreichen Steine bzw. Knochen die je Datei als Multipolygon vorliegen getrennt. Die rekursive Anweisung unterscheidet sich deutlich von der vorangehenden Version für genau zwei Polygone in einem Multipolygon.
+
+```{sql 'Tabelle individuelle Polygone per Rekursion erstellen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Create table tmp_polygonize_single as
+-- Beginn der Rekursion mit zwei Zählern und Geometrie
+with recursive liste ( fid, n, single ) as (
+ -- Erster Datensatz
+ select 1 as fid, 0 as n, null as single
+ union all
+ -- Alle folgenden Datensätze mit Entscheidung (case)
+ select
+ case -- Wenn die n-te Geometrie im Multipolygone existiert behalte fid sonst fid + 1
+  when (select ST_GeometryN(geometry, n + 1) from tmp_polygonize where rowid = fid) not null
+   then fid
+  else 
+   fid + 1
+ end as fid, -- end case und Zuweisung
+ case -- dito nur n + 1 sonst 0
+  when (select ST_GeometryN(geometry, n + 1) from tmp_polygonize where rowid = fid) not null
+   then n + 1
+  else
+   0
+ end as n, -- end case und Zuweisung
+ case -- dito nur wird jetzt die Geometrie übernommen
+  when (select ST_GeometryN(geometry, n + 1) from tmp_polygonize where rowid = fid) not null
+   then (select ST_GeometryN(geometry, n + 1) from tmp_polygonize where rowid = fid)
+  else
+    null
+ end as single
+from liste
+ -- Limit für die Rekursion.
+  where fid <= (select Count(*) from tmp_polygonize))
+Select a.fid, a.n, CastToMulti(single) as geometry, b.filename, b.layer from liste as a 
+ left join tmp_polygonize as b on a.fid = b.rowid
+ where single not null;
+```
+
+Diese Rekursive Abfrage ist mit den eingefügten Bedingungen (*case*) etwas umfangreicher aber nicht wirklich kompliziert. Die Grundkonstruktion der durch Rekursion gebauten Tabelle ("liste") hat drei Spalten für zwei Zähler ("fid", "n") und eine Geometrie ("single"). Die Tabelle liste startet mit dem Setzen der Zähler, wobei "fid" = 1 und "n" = 0 gesetzt wird. Für alle weiteren Datenzeilen wird per *select*-Anweisung geprüft, ob im Multipolygon der gegebenen "fid" das "n"+1 Polygon existiert. Ist dies vorhanden wird in den drei Bedingungen: 1. die "fid" behalten, 2: "n" + 1 gesetzt und 3. das zugehörige Polygon abgefragt. Alternativ wird für das nächste Multipolygon: 1. "fid" + 1 und 2. "n" zurück auf 0 gesetzt sowie 3. keine Geometrie übergeben. Das Limit für die Rekursion wird auf die Anzahl der vorhandenen Multipolygone gesetzt. Die Abfrage der durch Rekursion erstellten Tabelle "liste" wird per *join* mit den Eingangsdaten verbunden um nachträglich Dateiname und Layer zu erhalten. Zugleich wird das einfache Polygon wieder zu einem Multipolygon für die weitere Bearbeitung umgewandelt und auf die Zeilen mit Geometrie gefiltert. Die knapp 14400 Polygone werden in weniger als 3 Sekunden verarbeitet. Anmerkung: Etwas unkomplizierter ist an dieser Stelle ein *join* zu der Tabelle [ElementaryGeometries](https://www.gaia-gis.it/fossil/libspatialite/wiki?name=VirtualElementary). 
+
+Danach erfolgt das Prüfen, das Wiederherstellen und ggf. die Korrektur der Geometriespalte. 
+
+```{sql 'Tabelle individuelle Polygone prüfen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Select Count(*), GeometryType(geometry), Srid(geometry), CoordDimension(geometry)
+from tmp_polygonize_single
+group by 2, 3, 4;
+
+Select RecoverGeometryColumn('tmp_polygonize_single', 'geometry', -1, 'MULTIPOLYGON', 'XY');
+
+Select *, AsText(geometry) from tmp_polygonize_single
+ where IsValid(geometry) <> 1;
+
+Update tmp_polygonize_single
+ set geometry = ST_MakeValid(geometry)
+ where IsValid(geometry) <> 1;
+```
+
+Der dann vorliegende saubere Datenbestand kann an die Tabelle polyg_layer_2d angefügt und die Tabelle selbst gelöscht werden.
+
+```{sql 'Tabelle der individuellen Polygone anfügen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Insert into polyg_layer_2d (filename, layer, geometry)
+ select filename, layer, geometry from tmp_polygonize_single;
+-- löschen
+Drop table if exists tmp_polygonize_single;
+```
+
+Wenn gewünscht noch die verarbeiteten Linien aus line_layer_2d löschen, dies erfolgt in zwei Schritten: 1. Wird eine Sicht (*view*) der verarbeiteten ID's mittels Rekursion erstellt und 2. dann mit dieser die entsprechenden Einträge in der Tabelle der Linien gelöscht. Leider erstellt die  *Group_Concat*-Anweisung einen Langen Text und keine Liste von Zahlen, so ein Zwischenschritt vorangestellt werden muss. Die Rekursion arbeitet erneut mit einer *case*-Anweisung, um jeweils das erste Element bis zum ersten "," und den Rest zu trennen. In der abschließenden Abfrage wird noch auf die Elemente ("feature_id") gruppiert, um die doppelten zu eliminieren.
+
+```{sql 'Tabelle der zu löschenden feature_id.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+-- Einspaltige Tabelle der feature_ids
+Create view tmp_delfids as
+with recursive liste (element, remainder) as (
+ select 0 as element, (select Group_Concat(fids) from tmp_polygonize) as remainder
+  union all
+ select
+  case
+   when instr(remainder, ',') > 0 then
+    substr(remainder, 0, instr(remainder, ','))
+  else
+   remainder
+  end as element,
+  case
+   when instr(remainder, ',') > 0 then
+    substr(remainder, instr(remainder, ',') + 1)
+  else
+   null
+  end as remainder
+from liste
+where remainder is not null
+)
+Select trim(element) as fid from liste where element is not null group by 1;  
+```
+
+Auf diese zuvor erstellte Sicht der ID's bezieht sich dann die folgende *delete*-Anweisung. Diese führe ich jetzt aber nicht aus, um die problemorientierte Lösung noch durchzuführen.
+
+```{sql 'Verarbeitete Linien löschen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Delete from cp_line_layer_2d
+where feature_id in (select fid from tmp_delfids);
+```
+
+### Polygone aus problemorientierter Lösung 
+
+Ein Problem sind die in AutoCAD nicht geschlossen Polygone bei denen Startpunkt und Endpunkt identische Werte haben. Dies ist durch eine *insert*-Anweisung einfach zu lösen. Danach sollte der Index von polyg_layer_2d aktualisiert und die ursprünglichen Linien gelöscht werden. 
+
+```{sql 'Linien mit identsichem Start- und Endpunkt', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+-- Anzahl der betreffenden Linien feststellen. 
+SELECT Count(*), layer from line_layer_2d
+where StartPoint(geometry) = EndPoint(geometry)
+group by 2;
+-- Diese Linien zu einem Multipolygon konvertieren mit weiteren Attributen 
+-- in die Tabelle der Polygone schreiben
+Insert into  polyg_layer_2d (filename, layer, geometry)
+select filename, layer, CastToMulti(ST_BuildArea(geometry)) as geometry
+from line_layer_2d where StartPoint(geometry) = EndPoint(geometry) 
+ and layer in ('KNOCHEN', 'STEINE');
+-- Den Index aktualisieren
+Select RecoverSpatialIndex(polyg_layer_2d, geometry);
+-- Die ursprünglichen Linien löschen, bzw. zur Kontrolle feature_id archivieren
+Delete from line_layer_2d 
+where StartPoint(geometry) = EndPoint(geometry)
+ and layer in ('KNOCHEN', 'STEINE');
+```
+
+Bei den verbleibenden Linien sind noch sehr viele auf den Layern STEINE und KNOCHEN. Um deren Struktur zu prüfen können einige Abfragen ausgeführt werden:
+
+```{sql 'Weitere Linien prüfen', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+-- Anzahl der optionalen Linien mit mehr als 2 Knoten feststellen. 
+SELECT Count(*), layer from line_layer_2d
+where NumPoints(geometry) > 2 
+ and layer in ('KNOCHEN', 'STEINE')
+group by 2;
+-- Wie viele würden, direkt geschlossen, ein valides Polygon ergeben?
+SELECT Count(*), layer, IsValid(ST_BuildArea(geometry)) 
+from line_layer_2d
+where NumPoints(geometry) > 2 
+ and layer in ('KNOCHEN', 'STEINE')
+group by 2, 3;
+```
+
+Nach einer visuellen Prüfung liegen nicht nur ideale Polylinien vor, bei denen lediglich eine Kante wegen eines benachbarten Polygons fehlt, vielmehr sind die Strukturen deutlich komplexer. Dennoch als Beispiel hier eine mögliche Konstruktion weiterer Polygone durch das Anfügen des Starpunktes als Endpunkt. 
+
+```{sql 'Startpunkt als Endpunkt für Polygon ergänzen und Polygon erstellen.', connection=od1db, eval=FALSE, message=FALSE, include=TRUE}
+Create table tmp_line2polyg as
+select feature_id, filename, layer, 
+ CastToMulti(ST_BuildArea(ST_AddPoint(geometry, ST_StartPoint(geometry)))) as geometry 
+from line_layer_2d
+where NumPoints(geometry) > 2 
+ and layer in ('KNOCHEN', 'STEINE');
+
+Delete from tmp_line2polyg where geometry is null;
+
+Select Count(*), GeometryType(geometry), Srid(geometry), CoordDimension(geometry)
+from tmp_line2polyg
+group by 2, 3, 4;
+
+Select RecoverGeometryColumn('tmp_line2polyg', 'geometry', -1, 'MULTIPOLYGON', 'XY');
+
+Select Count(*) , ST_IsValid(geometry), ST_SelfIntersections(geometry) from tmp_line2polyg
+group by 2, 3;
+```
+
+Viele weitere Linien mit nur zwei Punkten sind maximal 13 cm lang oder haben mit drei Punkten eine Länge bis 18 cm. Eine qualifizierte Entscheidung ist hier nicht wirklich zu treffen. 
+
+### Fazit Linie zu Polygon
+
+Vergleichen wir am Ende die "Erfolgszahlen" schneidet die "pauschale" Methode mit 21.200 verarbeiteten Linien deutlich besser ab als die problemorientierte Lösung mit 14.300 verarbeiteten Linien. Natürlich ist der vorliegende Fall von den Ausgangsdaten eher für die pauschale Version geeignet. Bei den Befunden einer Flächengrabung ist möglicherweise die zweite eher geeignet, ein Ergebnis entsprechend der ursprünglichen Dokumentation zu liefern. Viel hängt auch von der Datenqualität, also der genuinen Strukturierung und Umsetzung der ursprünglichen CAD-Daten ab. 
+
+Je effizienter einzelne Lösungswege umgesetzt werden können desto vielfältiger und zahlreicher sind die getesteten Lösungswege und umso größer ist auch die Bereitschaft, einzelne Ergebnisse auch wieder zu verwerfen. Zudem bieten die aufgezeigten Skripte die Möglichkeit, kleine Variationen einzubauen.  Hier liegt der große Vorteil der Automatisierung gegenüber der qualitativ hochwertigen aber langwierigen Einzelfallprüfung und Handarbeit. 
+
+# Literatur
