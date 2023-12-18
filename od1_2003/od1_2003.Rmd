@@ -15,6 +15,8 @@ lang: de-DE
 description: Transfer excavation plans from CAD files into a GIS for the re-utilisation of as much data as possible for spatial statistics. 
 ---
 
+[od1_2003](https://github.com/chrinne/digging.digital.data/tree/main/od1_2003) is part of the github repository [digging.digital.data](https://github.com/chrinne/digging.digital.data)
+
 # Summary {-}
 
 The text describes the transfer of excavation plans from CAD files into a GIS for the re-utilisation of as much data as possible for spatial statistics. The starting point is the retro-digitisation (2D) of a paper based documentation of a four-year excavation of the late Neolithic collective burial Odagsen 1, Einbeck, Northeim. This is not about a nice, interactive plan in a GIS. The text originates from courses in computational archaeology held in Kiel at the  Institute of Pre- and Protohistoric Archaeology. 
