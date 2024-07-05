@@ -376,3 +376,15 @@
         on `Grabkomplex_Literatur` ( `Literaturnummer`, `Grabkomplexnummer` );"
 "create unique index if not exists `Grab_Stratigraphie_idx` 
         on `Grab_Stratigraphie` ( `Grab_1`, `Grab_2` );"
+"create unique index if not exists `Gebiet_Fundplatz_idx` 
+        on `Gebiet_Fundplatz` ( `Fundplatz` );"
+"create unique index if not exists `Fundplatz_Literatur_idx` 
+        on `Fundplatz_Literatur` ( `Literaturnummer`,`Fundplatznummer` );"
+"create unique index if not exists `Fundplatz_idx` 
+        on `Fundplatz` ( `Fundplatznummer` );"
+"create unique index if not exists `Ausgrabung_Fundplatz_idx` 
+  on `Ausgrabung_Fundplatz` ( `Fundplatz`, `Ausgrabungqualität`, `Ausgrabungsjahr`, `Ausgräber` );"
+"create unique index if not exists `Grabkomplex_Literatur_idx` 
+        on `Grabkomplex_Literatur` ( `Literaturnummer`, `Grabkomplexnummer` );"
+"create unique index if not exists `Grab_Stratigraphie_idx` 
+        on `Grab_Stratigraphie` ( `Grab_1`, `Grab_2` );"
