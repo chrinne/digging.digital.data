@@ -196,7 +196,7 @@ In SQLite können Relationen, als REFERENCE bezeichnet, nicht auf vorhandenen Fe
 Hier ein Beispiel mit den zuvor schon verwendeten Tabellen Alter und Anthropologie.
 
 ```{sql Index für Alter erstellen, eval=FALSE, include=TRUE, connection=db01}
-create unique index 'Altersnummer' on 'Alter'(Altersnummer);
+create unique index 'Altersnummer' on 'Alter' (Altersnummer);
 ```
 
 ```{sql Alter: Spalte mit Referenz erstellen, eval=FALSE, include=TRUE, connection=db01}
@@ -217,7 +217,7 @@ Um unnötige Handarbeit zu reduzieren, wird hier ein halbautomatischer Prozess m
 2. mofizieren mit gsub (Regulärer Ausdruck) und 
 3. kontrollieren und korrigieren.
 
-```{r CREATE TABLE-Anweisung für den Index umbauen, eval=FALSE}
+```{r CREATE TABLE-Anweisung für den Index umbauen}
 dbGetQuery(db01, "select sql from sqlite_master where type = 'table' and (sql like '%nummer%' or sql like '%_Nummer');") %>%
   # Zeilenumbrüche in der SQL-Anweisung entfernen.
   mutate(., sql = gsub("\\n","", sql)) %>% 
@@ -353,9 +353,9 @@ for (i in 1:nrow(create_relation)){
                          "' add column '", relation[1,2], 
                          "' INTEGER REFERENCES '", 
                          relation[1,1],"'(",relation[1,2],");"))
- dbExecute(db01, paste0("update '", relation[1,3], 
-                        "' set '", relation[1,2], 
-                        "' = '", relation[1,4], "';")) 
+ dbExecute(db01, paste0("update '", relation[1,3], "' as a ", 
+                        " set '", relation[1,2], 
+                        "' = a.'", relation[1,4], "';")) 
 } 
 ```
 
