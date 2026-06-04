@@ -1,0 +1,9 @@
+bibentry(
+  key = "NahrendorfKatalog2018SQLite2026",
+  bibtype  = "manual",
+  title    = "Ulrich Nahrendorf: Westfalen in Endneolithikum und Früher Bronzezeit. Der Katalog als SQLite",
+  author = c(person("Christoph", "Rinne"), person("Leon", "Schadler")),
+  note  = "Erläuterungen zu der aus dem Katalog erstellten SQLite-Datenbank mit Koordinaten und ergänzenden Rauminformationen.",
+  year     = "2026",
+  url      = "Zenodo"
+)

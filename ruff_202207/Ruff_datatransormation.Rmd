@@ -1,0 +1,418 @@
+---
+title: "Chris Ruff – Functional Anatomy & Evolution: European-Data-Set-7-22.xlsx"
+subtitle: "Transfer the data into R and SQLite" 
+author: "Christoph Rinne"
+date: "ver. 0.0 2026-06"
+output:
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    code_folding: hide
+    df_print: kable
+    theme: readable
+version: Version 0.0
+papersize: a4
+urlcolor: blue
+link-citations: true
+linkcolor: blue
+license: "CC-BY 4.0"
+description: "The primary Excel file 'European-Data-Set-7-22.xlsx' derives from and can be downloaded from: http://www.hopkinsmedicine.org/fae/CBR.html. Other publications that have used major subsets of this data set include Ruff et al., 2012, 2015, and Sladek et al., 2016. 
+The data in the Excel file were collected as part of a project funded primarily by the US National Science Foundation and carried out between 2007 and 2015. The primary researchers involved in the project were Christopher Ruff (Johns Hopkins University, Baltimore, cbruff@jhmi.edu), Brigitte Holt (University of Massachusetts, Amherst, holtmb@hotmail.com), Markku Niskanen (University of Oulu, Finland, markku.niskanen@oulu.fi), Vladimir Sládek (Charles University, Prague, sladekv@yahoo.fr), and Margit Berner (Natural History Museum, Vienna, margit.berner@NHM-WIEN.AC.AT).
+The presented document transforms this data for further use in R an SQLite."
+
+---
+
+## Introduction
+
+The original Excel file '[European-Data-Set-7-22.xlsx](https://fae.johnshopkins.edu/wp-content/uploads/2022/08/European-Data-Set-7-22.xlsx)' with supplementary information [PDF](https://fae.johnshopkins.edu/wp-content/uploads/2022/08/Notes-on-European-Data-Set-7-22.pdf) derives from and can be downloaded  from: http://www.hopkinsmedicine.org/fae/CBR.html. 
+
+> Please download the file yourself; the website blocks simple automated downloads via download.file() or GET().
+
+> This document aims at a ready-to-use transformation of the original variable names in R and SQLite, compiling a minimal set of information for the variables and a structural reorganisation of the data in the SQLite database for further data processing and investigation.
+
+The data in the Excel file were collected as part of a project funded primarily by the US National Science Foundation and carried out between 2007 and 2015. The primary researchers involved in the project were Christopher Ruff (Johns Hopkins University, Baltimore, cbruff@jhmi.edu), Brigitte Holt (University of Massachusetts, Amherst, holtmb@hotmail.com), Markku Niskanen (University of Oulu, Finland, markku.niskanen@oulu.fi), Vladimir Sládek (Charles University, Prague, sladekv@yahoo.fr), and Margit Berner (Natural History Museum, Vienna, margit.berner@NHM-WIEN.AC.AT).
+
+All code is integrated into this document and can be viewed with \[Show]. 
+
+```{r setup, include=TRUE, echo=TRUE}
+# Set document default values.
+# Load & install pacman to load the needed R packages.
+Sys.setlocale("LC_ALL", "English_United Kingdom.65001")
+knitr::opts_chunk$set(echo = TRUE, fig.align="center", include = TRUE)
+require(pacman) || install.packages("pacman")
+pacman::p_load(DBI, ggplot2, readxl, tidyr)
+```
+
+## Data processing
+
+Read the original Excel file into the R environment.
+
+```{r read the Excel file}
+d <- readxl::read_excel("./European-Data-Set-7-22.xlsx")
+```
+
+The variable names have some inconvenient symbols for easy use in R or SQL statements. In addition, there are some further inconsistencies, e.g. abbreviations and punctuation. We therefore convert all variable names to lowercase and replace all non-letters or digits with a single "\_", preferable for use in R and SQLite. In addition we provide a table with the original and changed variable names, adding a column with condensed information derived from the provided [PDF](https://fae.johnshopkins.edu/wp-content/uploads/2022/08/Notes-on-European-Data-Set-7-22.pdf) from the data source (see above). Unfortunately not all are explained adequately, e.g. for ‘LHIX’ only ‘IX’ is explained and we suggest ‘LH’ to be read as ‘left humerus’ although Femur and Tibia have variable ‘FSIDE’ for laterality.
+
+Due to personal convenience and competence the data processing is split into a part for variable naming in R and structural reorganisation in SQLite. Please take into account '*type affinity*' in the SQLite database.
+
+###  R: variable names & information
+
+```{r processing variable names}
+# get original variable names 
+varnames_orig <- colnames(d)
+# change to lower and non letters or digits to a single _ using anonym lambda
+varnames_clean <- tolower(varnames_orig) |>
+  (\(v) gsub("[^a-z,0-9]", "_", v))() |>
+  (\(v) gsub("_$","",v))() |>
+  (\(v) gsub("__","_",v))()
+```
+
+Provide variable information. 
+
+```{r provide condensed variable information}
+varnames_info <- c(
+  "Investigator", 
+  "Period, temporal", 
+  "Subperiod, e.g. prehistoric periods", 
+  "Period number", 
+  "Original dates, e.g. AD/BC, BP uncalibrated/calibrated", 
+  "Mean age in years BP of `Date range`. BP = 2000AD for recent period", 
+  "Region", 
+  "Subregion", 
+  "Region number", 
+  "Information on archaeological associations, ethnicity, or other lifestyle attributes, as appropriate", 
+  "Site name", 
+  "Specimen number in the local context", 
+  "Collection providor", 
+  "Latitude", 
+  "Longitude", 
+  "Average slopes within a 10 km radius of each site", 
+  "Maximum slopes within a 10 km radius of each site", 
+  "codes of 1: flat, 2: hilly, 3: mountainous", 
+  "codes of 1: rural and 2: urban", 
+  "codes of 1: male, 2: female", 
+  "Specific ages for known-age for Very recent or Early modern individuals,  ranges for others", 
+  "means of ranges or 38 (mean of pooled sample) for unknown.", 
+  "Bi-iliac breadth, does not include any soft tissue correction", 
+  "M-L breadth described by Tague (1989), ), measured between the most anterior points of the auricular surfaces", 
+  "ML2 is maximum M-L breadth of the entire sacrum", 
+  "", 
+  "", 
+  "Sum of vertebral body heights (maximum anterior to the pedicles) of L5 through C2", 
+  "Anterior height of S1 sacral segment", 
+  "Basion-bregma height", 
+  "Talar+calcaneal height", 
+  "Sum of TAL-CAL HT., FBICLN, TFULLN, S1HT, PRESACRAL HT. and BAS-BREG HT", 
+  "Anatomical stature calculated with all dimensions except basion-bregma height", 
+  "Calculate anatomical (living) stature", 
+  "Calculated from full skeletal height, where available (n = 537), for others calculated from long bone lengths using formulae derived from this sample (Ruff et al., 2012)", 
+  "kg, calculated from stature and bi-iliac breadth (when both dimensions were available) or femoral head S-I breadth", 
+  "Femur, code of 1: right, 2: left", 
+  "Femur maximum length (Fem1)", 
+  "Femur bicondylar length (Fem2)", 
+  "Femur biomechanical length, used to locate cross sections", 
+  "femoral head S-I breadth", 
+  "femoral distal articular M-L breadth", 
+  "Femur shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Femur shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Tibia, code of 1: right, 2: left", 
+  "Tibia maximum length (including tibial spines)(Tib1a)", 
+  "Tibia  length used in anatomical stature calculation", 
+  "Tibia  biomechanical length, used to locate cross sections (L missing?)", 
+  "tibial plateau M-L breadth", 
+  "Tibia shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Tibia shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Humerus, right, maximum length (Hum1)", 
+  "Humerus, right, bicondylar length", 
+  "Humerus, right,  head S-I breadth", 
+  "Humerus, right, distal articular M-L breadth", 
+  "Humerus, right, shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Humerus, right, shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Humerus, right, shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Humerus, right, shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Humerus, left, maximum length (Hum1)", 
+  "Humerus, left, bicondylar length", 
+  "Humerus, left,  head S-I breadth", 
+  "Humerus, left, distal articular M-L breadth", 
+  "Humerus, left, shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Humerus, left, shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Humerus, left, shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Humerus, left, shaft breadths at the given locations (50% or 35% of biomechanical length from the distal endpoint of that length)", 
+  "Radius, right, maximum length (R1b)", 
+  "Radius, right, bicondylar length", 
+  "Radius, left, maximum length", 
+  "Radius, left, bicondylar length", 
+  "Femur, second moments of area about the x and y axes (A-P and M-L bending rigidities, respectively)", 
+  "Femur, second moments of area about the x and y axes (A-P and M-L bending rigidities, respectively)", 
+  "Femur, section moduli about the x and y axes (A-P and M-L bending strengths, respectively)", 
+  "Femur, section moduli about the x and y axes (A-P and M-L bending strengths, respectively)", 
+  "Femur, total subperiosteal areas", 
+  "Femur, total cortical areas", 
+  "Femur, maximum and minimum second moments of area (bending rigidities)", 
+  "Femur, maximum and minimum second moments of area (bending rigidities)", 
+  "Femur, polar second moment of area (torsional and (twice) average bending rigidity)", 
+  "Femur, polar section modulus (torsional and (twice) average bending strength)", 
+  "Tibia, second moments of area about the x and y axes (A-P and M-L bending rigidities, respectively)", 
+  "Tibia, second moments of area about the x and y axes (A-P and M-L bending rigidities, respectively)", 
+  "Tibia, section moduli about the x and y axes (A-P and M-L bending strengths, respectively)", 
+  "Tibia, section moduli about the x and y axes (A-P and M-L bending strengths, respectively)", 
+  "Tibia, total subperiosteal areas", 
+  "Tibia, total cortical areas", 
+  "Tibia, maximum and minimum second moments of area (bending rigidities)", 
+  "Tibia, maximum and minimum second moments of area (bending rigidities)", 
+  "Tibia, polar second moment of area (torsional and (twice) average bending rigidity)", 
+  "Tibia, polar section modulus (torsional and (twice) average bending strength)", 
+  "Humerus, left, second moments of area about the x and y axes (A-P and M-L bending rigidities, respectively)", 
+  "Humerus, left, second moments of area about the x and y axes (A-P and M-L bending rigidities, respectively)", 
+  "Humerus, left, section moduli about the x and y axes (A-P and M-L bending strengths, respectively)", 
+  "Humerus, left, section moduli about the x and y axes (A-P and M-L bending strengths, respectively)", 
+  "Humerus, left, total subperiosteal areas", 
+  "Humerus, left, total cortical areas", 
+  "Humerus, left, maximum and minimum second moments of area (bending rigidities)", 
+  "Humerus, left, maximum and minimum second moments of area (bending rigidities)", 
+  "Humerus, left, polar second moment of area (torsional and (twice) average bending rigidity)", 
+  "Humerus, left, polar section modulus (torsional and (twice) average bending strength)",
+  "Humerus, right, second moments of area about the x and y axes (A-P and M-L bending rigidities, respectively)", 
+  "Humerus, right, second moments of area about the x and y axes (A-P and M-L bending rigidities, respectively)", 
+  "Humerus, right, section moduli about the x and y axes (A-P and M-L bending strengths, respectively)", 
+  "Humerus, right, section moduli about the x and y axes (A-P and M-L bending strengths, respectively)", 
+  "Humerus, right, total subperiosteal areas", 
+  "Humerus, right, total cortical areas", 
+  "Humerus, right, maximum and minimum second moments of area (bending rigidities)", 
+  "Humerus, right, maximum and minimum second moments of area (bending rigidities)", 
+  "Humerus, right, polar second moment of area (torsional and (twice) average bending rigidity)", 
+  "Humerus, right, polar section modulus (torsional and (twice) average bending strength)" 
+)
+```
+
+Rename the variables, combine the previous information into the dataframe var_info and write this into an external CSV. 
+
+```{r aggregate and write df var_info}
+colnames(d) <- varnames_clean
+cbind(varnames_orig, varnames_clean, varnames_info) |>
+  as.data.frame() -> var_info
+write.csv(var_info, "var_info.csv")
+```
+
+For convenience we convert some variables to factors according to the provided codes.
+
+```{r some variables to factors}
+d$terr_code <- factor(d$terr_code, 
+                         levels = c(1, 2, 3), 
+                         labels = c("flat", "hilly", "mountainous"))
+d$rural_urban <- factor(d$rural_urban, 
+                           levels = c(1, 2),
+                           labels = c("rural", "urban"))
+d$sex <- factor(d$sex, 
+                levels = c(1, 2),
+                labels = c("male", "female"))
+d$fside <- factor(d$fside, 
+                  levels = c(1, 2),
+                  labels = c("right", "left"))
+d$tside <- factor(d$tside, 
+                  levels = c(1, 2),
+                  labels = c("right", "left"))
+```
+
+Example of the changes:
+
+```{r short preview of var_info}
+head(var_info, n = 6) |> 
+knitr::kable()
+```
+
+### Data inconsistency
+
+Looking at the variables for the bone measurements there are two different strategies in **recording laterality**. While there is only one set of measures for Femur and Tibia with a decision on left or right side, we expect the prefix HR, HL, RH, LH, RR, RL to represent left and right Humerus or Radius. If this is true, in many cases two measurements for each measure are present. In addition, the variables should be renamed in favour of a consistent prefix.
+
+```{r select left/right Humerus/Radius}
+varnames_orig[grep("^[HLR][HLR]",varnames_orig)] |>
+  paste(collapse = ", ") |>
+  cat()
+```
+
+```{r select adjust left/right Humerus/Radius, class.source = "fold-show"}
+# gsub-expression changes the order of the two leading letters
+# change v to the corresponding vector, e.g. varnames_orig
+varnames_orig[grep("^[HLR][HLR]",varnames_orig)] |>
+  (\(v) gsub("^([LR])([HR])(.+)","\\2\\1\\3", v))() |>
+  paste(collapse = ", ") |>
+  cat()
+```
+
+During our work we noticed some inconsistencies in the **subregion data**.
+
+```{r data inconsitency, class.source = "fold-show"}
+d$subregion[d$subregion == "C.Sweden"] <- "Central Sweden"
+d$subregion[d$subregion == "C. Sweden"] <- "Central Sweden"
+d$subregion[d$subregion == "Northeast Italy"] <- "NE Italy"
+d$subregion[d$subregion == "Northern France"] <- "N France"
+d$subregion[d$subregion == "Northwest France"] <- "NW France"
+d$subregion[d$subregion == "Northern Italy"] <- "N Italy"
+d$subregion[d$subregion == "Northwest Italy"] <- "NW Italy"
+d$subregion[d$subregion == "N. England"] <- "N England"
+d$subregion[d$subregion == "S. Sweden"] <- "S Sweden"
+d$subregion[d$subregion == "S.Finland"] <- "S Finland"
+d$subregion[d$subregion == "S. England"] <- "S England"
+d$subregion[d$subregion == "Southeast France"] <- "SE France"
+d$subregion[d$subregion == "Southern France"] <- "S France"
+d$subregion[d$subregion == "Southern Italy"] <- "S Italy"
+d$subregion[d$subregion == "Southwest France"] <- "SW France"
+table(d$subregion) |>
+  knitr::kable(col.names = c("subregion", "count"),
+               caption = "subregions")
+```
+
+### SQLite: data structure reorganisation
+
+Create and set a connection to a SQLite database: EuropeanDataSet\_22\_07.sqlite. Write boath dataframes into the the database.
+
+```{r set and write SQLite database}
+db01 <- DBI::dbConnect(RSQLite::SQLite(), 
+                       dbname = "./EuropeanDataSet_22_07.sqlite")
+DBI::dbWriteTable(db01, "orig_table", d, overwrite = TRUE)
+DBI::dbWriteTable(db01, "var_info", var_info, overwrite = TRUE)
+```
+
+#### Create a table sites 
+
+Write the site-specific information into its own table. Several sites differ by  period or investigator.  This redundancy is preserved in favour of a simple structure with minimal changes. In addition, we concatenate the rowids as column orig_ids of the original dataset for further data processing.
+
+```{r extract the site related informations into a table}
+site_vars <- var_info$varnames_clean[c(11,1:10,13:19)] |>
+  paste(collapse = ", ")
+sql <- paste0("create table sites as select ", 
+              site_vars,
+              ", group_concat(rowid) as orig_ids",
+              " from orig_table group by ",
+              site_vars,
+              ";")
+DBI::dbExecute(db01, "drop table if exists sites;")
+DBI::dbExecute(db01, sql)
+sql <- NULL
+site_vars <- NULL
+```
+
+The new table sites provides `r dbGetQuery(db01, "select count(*) from sites;")[1,1]` records in total but only `r dbGetQuery(db01, "select count(distinct(site)) from sites;")[1,1]` distinct site names. It seems unlikely that this always happened by intention, e.g. the two Braunsdorf sites where only the coordinates differ. The multiple site names are:
+
+```{r}
+sql <- "select group_concat(site ||': '|| n, ', ') as 'multiple site names'
+        from (select site, count(*) as n from sites 
+        group by 1 having n > 1);"
+DBI::dbGetQuery(db01, sql)[1,1] |>
+  cat()
+```
+As the site names are not unique at the current level, we have to add an additional site_id. The current dataframe is written into the SQLite database.
+
+```{r}
+DBI::dbExecute(db01, "alter table sites add column site_id integer;")
+DBI::dbExecute(db01, "update sites set site_id = rowid;")
+sites <- dbReadTable(db01, "sites")
+```
+
+The sites are distributed all over Europe with concentrations in Denmark and central and Southeast Europe. 
+
+```{r}
+psites <- dbGetQuery(db01, "select site, latitude, longitude 
+                    from sites group by 1, 2, 3;")
+capitals <- rbind(
+  c(lat = 40.5, long = -3.7, name = "Madrid"),
+  c(48.8, 2.3, "Paris"),
+  c(51.5, -0.1, "London"),
+  c(52.5, 13.4, "Berlin"),
+  c(47.5, 19.1, "Budapest"),
+  c(41.9, 12.5, "Rome"),
+  c(60, 10.7, "Oslo"),
+  c(60.2, 25, "Helsinki"),
+  c(55.7, 37.6, "Moskow")
+) |>
+  as.data.frame()
+capitals$lat <- as.numeric(capitals$lat)
+capitals$long <- as.numeric(capitals$long)
+plot(psites$longitude, psites$latitude, pch = 3, cex = 0.5,
+     asp = 1, xlab = "long", ylab = "lat", main = "sites")
+text(capitals$long, capitals$lat, capitals$name, cex = 0.7, adj = c(0.5,0.5))
+psites <- NULL
+```
+
+#### Create a table individuals
+
+We select all variables not included in the table sites, add a column for the site_id and create a table in the SQL database selecting these data from the original table. The corresponding site_id for each record in this table is updated within a for-loop with a sql update statement based on the concatenated rowids in the corresponding orig_ids field. 
+
+```{r}
+ind_vars <- varnames_clean[c(12,20:111)] |>
+  paste0(collapse = ", ")
+DBI::dbExecute(db01, "drop table if exists individuals;") 
+sql <- paste0("create table individuals as ",
+              "select 0 as site_id, ",
+              ind_vars,
+              " from orig_table;")
+DBI::dbExecute(db01, sql)
+for (i in 1:length(sites$site_id)){
+  orig_ids <- sites$orig_ids[sites$site_id == i]
+  sql <- paste0("update individuals as i ",
+                "set site_id = ", i ,
+                " where i.rowid in (",
+                orig_ids, ");") 
+  dbExecute(db01, sql)
+}
+ind_vars <- NULL
+sql <- NULL
+orig_ids <- NULL
+```
+
+Unfortunately there is one duplicate combination of site and specimen_no.
+
+```{sql, connection = db01}
+select s.site, i.specimen_no, i.sex, i.age_range, i.age_mean, i.stature
+from individuals as i left join sites as s on s.site_id = i.site_id
+where i.site_id||"_"||i.specimen_no in
+(select site_id||"_"||specimen_no as id 
+from individuals
+group by 1
+having count(*) > 1)
+```
+
+To get a clean identification of each record set we create ind_id using the rowid in the current table.
+
+```{r}
+DBI::dbExecute(db01, "alter table individuals add column ind_id integer;")
+DBI::dbExecute(db01, "update individuals set ind_id = rowid;")
+individuals <- dbReadTable(db01, "individuals")
+# convert fside and tside back to factor (left/right of Femur/Tibia)
+individuals$fside <- factor(individuals$fside, 
+                  levels = c("right", "left"),
+                  labels = c("right", "left"))
+individuals$tside <- factor(individuals$tside, 
+                  levels = c("right", "left"),
+                  labels = c("right", "left"))
+```
+
+#### Reorganizing individuals 
+
+The table for the individuals provides 95 variables, many of them without content (NULL): `r sum(is.na(d))` of `r dim(d)`. Visibility and performance can be improved if we transform this table to a long list of variables and corresponding values. The SQLite type affinity supports this strategy whereas in R the type of a variable has to be numeric or string. Fortunately all variables after age_range are numeric, apart from the factor variables fside and tside, the laterality of Femur and Tibia.
+
+```{r pivot individual variales into a long format}
+individuals$fside <- as.integer(individuals$fside)
+individuals$tside <- as.integer(individuals$tside)
+ind_variables <- tidyr::pivot_longer(individuals,
+                            cols = 5:95,
+                            names_to = "variable",
+                            values_to = "value",
+                            values_drop_na = TRUE)
+DBI::dbWriteTable(db01, "ind_variables", ind_variables, overwrite = TRUE)
+ind_variables[1:10,] |>
+  knitr::kable()
+```
+
+If you are happy with this data set you should remove the obsolete tables in the database and save the important dataframes to an R file.
+
+```{r final clean up}
+DBI::dbExecute(db01, "drop table if exists orig_table;")
+DBI::dbExecute(db01, "drop table if exists individuals;")
+DBI::dbExecute(db01, "vacuum;")
+DBI::dbDisconnect(db01)
+save(list = c("ind_variables", "sites", "var_info"), 
+     file = "EuropeanDataSet_22_07.RData")
+```

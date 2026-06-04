@@ -1,0 +1,445 @@
+---
+title: 'Ulrich Nahrendorf: Westfalen in Endneolithikum und Früher Bronzezeit'
+subtitle: 'Der Katalog als SQLite Datenbank.'
+author:
+- 'Christoph Rinne^[Christian-Albrechts-Universität zu Kiel, crinne@ufg.uni-kiel.de]'
+- 'Leon Schadler^[Christian-Albrechts-Universität zu Kiel, stu241494@mail.uni-kiel.de]'
+date: 'Version 1.0 (2026-04-01)'
+output:
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    code_folding: hide
+    df_print: kable
+    css: ./inst/tutorials.css
+    theme: readable
+version: Version 00
+papersize: a4
+urlcolor: blue
+link-citations: true
+linkcolor: blue
+license: "CC-BY 4.0"
+description: "Die SQLite-Datenbank erschließt die textbasierten Information des 
+948 Nummern umfassenden Kataloges in einer schlicht strukturierten, relationalen 
+Datenbank. Ergänzt wurden die Koordinaten für die Katalognummern und die 
+hieraus sich ergebende Zugehörigkeit zu den Naturräume des 
+Untersuchungsgebietes. Ebenso wurden die aus den Tabellen 10 und 12 zu erschließenden Fundobjektgruppen und Merkmalsgruppen der Keramik 1-4 erfasst. Erläutert wird die Struktur und der Inhalt ergänzt um 
+erste einfache Analysen anhand des vorliegenden Datenbestandes."
+---
+
+# Summary {-}
+
+The SQLite database organises the text-based information from the catalogue into a simply structured, relational database. The 948 catalogue numbers have been supplemented with coordinates and the resulting affiliation to the natural regions of the study area. Similarly, the artefact groups and characteristic groups of pottery 1–4 were recorded (s. Nahrendorf 2018, Tab. 10,12). The structure is explained and the content supplemented with an initial, simple analyses based on the available data to intodruce into a possible workflow.
+
+# Vorbemerkung {-}
+
+Der Text wird mit dem Programm [RStudio](https://posit.co/downloads/) (`r rstudioapi::versionInfo()$version`) in R-Markdown erstellt (introduction.Rmd) und ausschließlich als HTML zur Verfügung gestellt. Natürlich kann dieses Script auch in [POSITRON](https://positron.posit.co/) oder [QUARTO](https://quarto.org/) verwendet werden. Dieser Text und die Daten, die in drei Versionen und Dateiformaten vorliegen (s.u.), werden als Einheit verstanden.
+
+Der Text dient einerseits der Darstellung der zur Verfügung gestellten Daten, andererseits auch der Vermittlung von R mit SQLite als Datenquelle durch eine erste Auswertung. Der verwendete Code und die zugehörigen Kommentare stehen in sogenannten *Code chunks* (Codeblock), die als Teil des Textes *a priori* eingebunden aber zugleich ausgeblendet sind. Jeder Codeblock kann mit `[Show]` ein- und mit `[Hide]` ausgeblendet werden.  
+
+Es werden möglichst wenige R-Pakete verwendet (pacman, DBI, ggoplot2, magrittr): 
+
+```{r setup, include=TRUE, echo=TRUE}
+# pacman wird geladen und ggf. (||) dafür installiert. 
+# pacman ermöglicht das einfache Laden und Installieren von Paketen. 
+knitr::opts_chunk$set(echo = TRUE, fig.align="center", include = TRUE)
+require(pacman) || install.packages("pacman")
+pacman::p_load(DBI, ggplot2, magrittr)
+```
+
+# Einleitung
+
+Die Daten entstammen folgender Publikation:
+
+> U. Nahrendorf, Westfalen in Endneolithikum und Früher Bronzezeit: Untersuchungen zur Besiedlungsgeschichte der Nordwestdeutschen Landschaft zwischen Niederrhein und Mittelweser. Universitätsforschungen zur prähistorischen Archäologie 309 (Bonn 2018).
+
+Es handelt sich um die von Ulrich Nahrendorf zur Dissertation an der Westfälischen Wilhelms-Universität Münster im Jahr 1989 eingereichte Arbeit. Schon während der Arbeit war Ulrich Nahrendorf schwer erkrankt und ist vor der Veröffentlichung bereits 1993 verstorben. Die Redaktion und Veröffentlichung erfolgte nach der Aufarbeitung des Manuskriptes im LWL-Archäologie für Westfalen. (s. Vorwort) Die Lektüre des Vorwortes ist für die Kenntnis der Entstehungsgeschichte und die angemessene Wertung dieser Arbeit wichtig.
+
+Eine kritische Bewertung zum Forschungsstand und der Auswertung erfolgte in einer Rezension durch: 
+
+> D. P. Mielke, Archäologische Informationen 42, 2019, 
+435–439. [DOI ai.2019.0.69476](https://doi.org/10.11588/ai.2019.0.69476).
+
+Die verwendeten Geodaten zu den Naturräumlichen Haupteinheiten (kurz: Naturraum, NR) stammen vom [GEOportal.nrw](https://www.geoportal.nrw) und können sowohl über die Suche auf der Startseite (Bereich "Katalog") als auch über [OpenGeodata.NRW](https://www.opengeodata.nrw.de/produkte/umwelt_klima/naturschutz/linfos/) heruntergeladen oder als [WMS](https://www.wms.nrw.de/umwelt/linfos) genutzt werden.
+
+Die Daten wurden im Rahmen einer Übung im Bereich Archäoinformatik an der Christian-Albrechts-Universität zu Kiel im WS 2025/26 aufbereitet, in die vorliegende Datenbank überführt und erste Analysen durchgeführt, um den Mehrwert der nun vorliegenden Nachnutzbarkeit aufzuzeigen. Angewendet wurden Reguläre Ausdrücke im Texteditor [Notepad++](https://notepad-plus-plus.org/), der [DB Browser for SQLite](https://sqlitebrowser.org/), [QGIS](https://qgis.org) und [RStudio Desktop](https://posit.co/downloads/).
+
+# Die Daten und Tabellen
+
+Der Katalog ist sehr klar strukturiert, nur vereinzelt ergeben sich kleine Unzulänglichkeiten für die hier gewählte flache, einfache Struktur. Dies ist bei den Katalognummern (KatNr) mit mehreren Befunden der Fall, z.B. KatNr 64. Hier entscheidet, wie im textbasierten Katalog, die Abfolge der Nennung über die Zugehörigkeit der Fundobjekte zum jeweils zuvor genannten Befund unter dieser KatNr. Diese Abfolge ist aber durch die ID der Tabelle bei Bedarf zu erschließen.  
+
+Der Katalog von Nahrendorf nennt keine Koordinaten und die Fundpunkte auf den Karten der Tafeln besitzen keine KatNr. Eine Verbindung der Sach- und Raumdaten ist also nicht möglich. Für diese Datenbank wurden deshalb 1. die von der LWL-Archäologie für Westfalen, Nils Wolpert, zur Verfügung gestellten  Koordinaten und 2. die in [Google Earth](https://www.google.de) ermittelten und kontrollierten Positionen verwendet. Die Lokalisierung ist demnach nicht exakt, kann eventuell deutliche Abweichungen aufweisen und dient ausschließlich einer großmaßstäbigen Kartierung innerhalb des Untersuchungsgebietes.
+
+Die textbasierten Daten des Kataloges liegen primär als eine Datei mit SQL-Anweisungen vor [nahrendorf2018.sql](./nahrendorf2018.sql). Daraus generiert ist die SQLite-Datenbank *nahrendorf2018.sqlite*. Die SpatiaLite-Datei *nahrendorf2018_geo.sqlite* wurde zuerst mit [QGIS](https://qgis.org/) erstellt und dann wurden im [DB Browser for SQLite](https://sqlitebrowser.org/) die Anweisungen aus der Datei nahrendorf2018.sql ausgeführt. Die DB Verwaltung von QGIS beherrscht leider nicht das Ausführen multipler Anweisungen durch `BEGIN TRANSACTION; [...] COMMIT;`. Nachfolgend wurden die Polygone für die oben genannten NR im Untersuchungsgebiet importiert. Diese SpatiaLite-Datei ist wegen der  GIS-Implikationen über zehnmal größer.
+
+Für die Darstellung und die Analyse der Informationen in R (RStudio) wird eine Verbindung zur SQLite-Datenbank (DB) hergestellt. Nachfolgend kann auf diese Verbindung mit R- und SQL-Anweisungen in den entsprechenden gekennzeichneten Codeblöcken zugegriffen werden ({r ...}, {sql ...}).  R und SQL sind leicht zu unterscheiden, die SQL-Anweisungen beginnen hier fast ausnahmslos mit `SELECT`. In SQL werden Großbuchstaben traditionell zur Syntaxhervorhebung genutzt, die Großschreibung ist hier aber nicht relevant, in R schon.  
+
+```{r Verbindung zur Datenbank erstellen, echo=TRUE}
+ndb <- dbConnect(RSQLite::SQLite(), 
+                 dbname = "./nahrendorf2018.sqlite")
+```
+
+Die Namen der Tabellen sind weitgehend selbsterklärend. Für die Struktur wird nachfolgend jeweils die CREATE TABLE-Anweisung ausgegeben und nachfolgend der Inhalt knapp dargestellt.
+
+```{sql Tabellen in der Datenbank, connection = ndb}
+-- Zentrale Anweisung: select name from sqlite_master where type = 'table';
+-- Der Rest erstellt die Zeilennummer und das Layout. 
+select row_number() over (order by name) as 'nr', 
+      name  as 'table name' from sqlite_master where type = 'table' order by 1; 
+```
+
+## Fundorte
+
+```{r SQL Anweisung Fundorte, results='asis'}
+# Die SQL-Anweisung wird mit dbGetQuery() an die DB-Verbindung übergeben,
+# in der Rückgabe werden '\r\n' durch einfache '\n' ersetzt und
+# abschließend ausgegeben.
+
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'table' and name = 'Fundorte';") %>%
+  gsub('\r\n', '  \n', .) %>%
+  cat()
+```
+
+Die Tabelle Fundorte beinhaltet jede KatNr als eindeutigen Eintrag, dazu den ggf. redundanten Fundortnamen, dies ist z.B. bei Ahaus-Alstätte der Fall, und  das Kreiskürzel als externe Referenz zur Tabelle Kreise. Die Tabelle enthält `r dbGetQuery(ndb, "select count(*) from Fundorte;")[1,1]` Einträge. Die Anzahl der Fundorte je Kreis ist sehr unterschiedlich und nur bedingt von der Fläche des Kreises abhängig:
+
+```{r Fundorte je Kreis, results='asis'}
+sql <- "select group_concat(KreisAnz, ', ') 
+        from (select KreisID, KreisID || ': ' || count(*) as 'KreisAnz' 
+              from Fundorte group by 1);"
+dbGetQuery(ndb, sql)[1,1] %>%
+  cat(.)
+```
+
+## Gruppen
+
+```{r SQL Anweisung Gruppen, results='asis'}
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'table' and name = 'Gruppen';") %>%
+  gsub('\r\n', '  \n', .) %>%
+  cat()
+```
+
+Die Tabelle Gruppen dient der Aggregierung der Fundorte, aktuell ist jeder NR hier mit Informationen Vertreten. Über die Tabelle KatNrGruppen ist eine m:n-Beziehung möglich. Aktuell sind 15 übergeordnete NR vorhanden:
+
+```{r Naturräume-KatNr}
+sql <- "select a.GruppeID, a.Info, count(b.KatNr) as 'Anz. KatNr' 
+        from Gruppen as a
+        left join KatNrGruppen as b on a.GruppeID = b.GruppeID
+        where length(a.GruppeID) = 5
+        group by 1, 2;"
+dbGetQuery(ndb, sql)
+```
+
+Darüber hinaus stehen weitere `r dbGetQuery(ndb, "select count(*) from Gruppen where length(GruppeID > 5)")[1,1]` untergeordneter NR-Gruppen mit weiterführenden Informationen als Web-Link zur ursprünglichen Datenquelle (s.o.) zur Verfügung. Hier die ersten fünf Einträge:
+
+```{sql Naturraum Gruppen Detail, connection = ndb}
+select GruppeID, Info from Gruppen 
+where length(GruppeID) > 5 and substr(GruppeID,1,3) = "NR-" 
+limit 5;
+```
+
+In der Tabelle Gruppen können weitere Gruppen zu diversen Themen angelegt werden. Wir haben hier auch alle Fundorte mit dem jeweiligen Objekttyp der Tabelle zu den Fundvergesellschaftungen (Nahrendorf 2018, 56, Tab. 10) und die Keramikmerkmale der Tabelle 12 je KatNr erfasst (Nahrendorf 2018, 58).
+
+## KatNrGruppen
+
+```{r SQL Anweisung KatNrGruppen, results='asis'}
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'table' and name = 'KatNrGruppen';") %>%
+  gsub('\r\n', '  \n', .) %>%
+  cat()
+```
+
+Die Tabelle speichert die m:n-Beziehungen zwischen den Fundorten (KatNr) und den Gruppen. Entsprechend ist eine Bedingung, dass ein Fundort einer Gruppe auch nur einmal zugewiesen werden kann (constrain für unique). Zudem verweisen die Spalten KatNr und GruppeID als externe Referenz auf die jeweiligen Tabellen. So können alle Fundorte mit den chronologisch sensiblen Keramiktypen (1-4) abgefragte werden (vgl. Nahrendorf 2018, 55 f.).
+
+```{sql KatNr Keramiktyp.1, connection = ndb}
+select GruppeID as 'Keramiktyp', group_concat(KatNr, ', ') as 'Kat.-Nr.' 
+from KatNrGruppen
+where GruppeID like 'Keramiktyp.%'
+group by 1;
+```
+
+## Katalog
+
+```{r SQL Anweisung Katalog, results='asis'}
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'table' and name = 'Katalog';") %>%
+  gsub('\r\n', '  \n', .) %>%
+  cat()
+```
+
+Diese Tabelle beinhaltet alle Angaben (Wert) des Kataloges getrennt nach KatNr und Informationseinheit (Attribut). Hierbei sind Angaben zu Fundobjekten besonders häufig und konkrete Angaben zur Datierung nur singulär vorhanden.
+
+```{sql Attribute Anzahl Wert, connection = ndb}
+Select attribut, count(*) as 'Anz. Einträge' from Katalog group by 1;
+```
+
+## Koord
+
+```{r SQL Anweisung Koord, results='asis'}
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'table' and name = 'Koord';") %>%
+  gsub('\r\n', ' \n', .) %>%
+  cat(.)
+```
+
+Die Tabelle Koord umfasst aktuell `r dbGetQuery(ndb, "select count(*) from Koord")[1,1]` Einträge, eine Koordinate je KatNr (Fundort). Die Koordinaten liegen als WKT (Well Known Text) in EPSG 4326 (WGS 84) vor. Dies erlaubt den Eintrag unterschiedlicher Geometrietypen in einem einzigen Textfeld, die nach der Trennung durch das Präfix, z.B. Point, in einem GIS unmittelbar verwendet werden können. Aktuell liegen nur Punkte (POINT()) vor. Das jeweils genannte Koordinatensystem (srid), erlaubt die korrekte Projektion jeder Koordinate. 
+
+```{sql Koordinaten Quelle, connection = ndb}
+select Quelle, srid, count(*) as 'Anz. KatNr' 
+from Koord group by 1, 2;
+```
+
+Die Quelle verweist auf die Herkunft und impliziert in diesem Fall auch eine Genauigkeit. Die Koordinaten wurden zu einem kleineren Teil durch die LWL-Archäologie für Westfalen bereitgestellt und sind entsprechend genau. Der größere Anteil wurde anhand des Fundortnamens, der Kreisangabe und anhand der Beschreibung im Katalog in Google Earth annähernd lokalisiert. Die Koordinaten sind deshalb nur für eine großmaßstäbige Kartierung geeignet.
+
+```{r Koordinaten Plot}
+koords <- dbGetQuery(ndb, "select 
+                            substr(wkt, 7, instr(wkt, ' ') - 7) as x,
+                            rtrim(substr(wkt, instr(wkt, ' ')+1),')') as y
+                            from Koord;")
+sites <- dbGetQuery(ndb, "select  7.436 as x, 52.283 as y, 'Rheine' as name
+                          UNION ALL
+                          select 9.491, 51.311, 'Kassel'
+                          UNION ALL
+                          select 8.913, 52.246, 'Porta Westfalica'
+                          UNION ALL
+                          select 6.782, 51.223, 'Düsseldorf'
+                          UNION ALL
+                          select 7.626, 51.960, 'Münster';")
+plot(koords, pch = 3, cex = 0.5, col = 'grey', xlim = c(6.4,9.6),
+     asp = 1, xlab = 'long', ylab = 'lat', main = 'Fundorte') 
+text(sites$x, sites$y, sites$name, cex = 0.8, adj = c(0.5,0.5))
+```
+
+## Kreise
+
+```{r SQL Anweisung Kreise, results='asis'}
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'table' and name = 'Kreise';") %>%
+  gsub('\r\n', '  \n', .) %>%
+  cat()
+```
+
+Die Tabelle der Kreise bietet im Wesentlichen nur die Auflösung der im Katalog und der Datenbank verwendeten Kreiskürzel.
+
+# Erste Analysen
+
+Das Untersuchungsgebiet wird durch sehr unterschiedliche größere NR geprägt (s.o.), die sich sehr verallgemeinernd in die Beckenlandschaften und Hügel- bis Bergregionen gliedern lassen. Für beide Bereiche können jeweils angepasste ökonomische Aktivitäten erwartet werden, die  ggf. in einem  jeweils spezifischen Gerätespektrum resultieren. Ebenso können Unterschiede in der Versorgung mit Rohmaterial und den daraus erzeugten Produkten vorliegen. 
+
+Diese NR entsprechen weitgehend den geographischen Einheiten, die in der Arbeit von Nahrendorf eingehend betrachtet werden: 
+
+ 1. das Westfälische Tiefland (NR-58, NR-62), 
+ 2. die Westfälische Bucht (NR-54, die Paderborner Hochfläche von NR-36, NO Niederrheinische Tiefland NR-57), 
+ 3. das Südergebirge (NR-33) und 
+ 4. das Weserbergland (Teil des Westhessischen Berglandes NR-34, Obere- und Untere Weserbergland (NR-36, NR-53).
+
+Auf Grundlage einzelner Fundkonzentrationen bildet Nahrendorf innerhalb der vorgenannten geographischen Einheiten, verschiedene Siedlungsräume. Diese versteht er als an die jeweiligen Bedürfnisse angepasste, ökologische Gunsträume  (Nahrendorf 2018, 49-51).
+
+## Pfeilspitzen und Klingen
+
+Getrennt nach den Naturräumen wird die Breite von Pfeilspitzen und Klingen verglichen. Für Pfeilspitzen ist vorrangig eine funktional bedingte, maximale Breite zu erwarten, die sich aufgrund der Ballistik aus dem Pfeilkopfgewicht und der Durchschlagskraft ergibt. Zudem ist  die Verfügbarkeit von Abschlägen mit einer angemessenen Breite eine grundsätzliche Voraussetzung. Abschläge sind im Katalog zwar mehrfach, aber fast ausnahmslos ohne Maße erwähnt. Aus diesem Grund werden die Maße der Klingen zum Vergleich herangezogen.  
+
+Die je Artefakttyp mit einer SQL-Anweisung gefilterten  Maße werden mit `UNION ALL` kombiniert. Eine zweite SQL-Anweisung, hier zur Übersichtlichkeit getrennt, ergänzt den jeweiligen Naturraum.
+
+```{r SQL Anweisung View Pfeile Klingen Masse, results='asis'}
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'view' and name = 'Pfeile_Klingen_Masse';") %>%
+  gsub('\r\n', '  \n', .) %>%
+  gsub('CREATE VIEW', '-\u200B- CREATE VIEW', ., fixed = TRUE) %>%
+  cat()
+```
+
+
+```{r SQL Anweisung View Pfeile Klingen Raum, results='asis'}
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'view' and name = 'Pfeile_Klingen_Masse_Raum';") %>%
+  gsub('\r\n', '  \n', .) %>%
+  gsub('CREATE VIEW', '-\u200B- CREATE VIEW', .) %>%
+  cat()
+```
+
+Die Daten der letzten Sicht (*view*) können direkt geladen und verarbeitet werden.
+
+```{r Pfeile Klinge Breite Naturraum}
+dbReadTable(ndb, "Pfeile_Klingen_Masse_Raum") %>%
+  transform(Breite = ifelse(Breite == 0, NA, Breite)) %>%
+  transform(Laenge = ifelse(Laenge == 0, NA, Laenge)) %>%
+  ggplot(., aes(x = GruppeID, y = Breite, fill = Objekt)) +
+    geom_boxplot(position = position_dodge(width = 0.75, preserve = "single"),
+                  outlier.shape = NA) +
+    scale_fill_manual(values = c('lightblue','lightgreen')) +
+    geom_point(aes(color = Objekt), alpha = 0.4, 
+              position = position_jitterdodge(jitter.width = 0.5,
+                                             dodge.width = 0.75)) +
+    scale_color_manual(values = c('darkblue','darkgreen')) +
+    labs(title = "Pfeilspitzen & Klingen", x = "Naturraum", y = "Breite (cm)") +
+    theme(
+      axis.title = element_text(size = 12)
+    )  
+```
+
+Die genannten Naturräume haben sehr unterschiedliche Fundzahlen und ein Vergleich mit NR-34, NR-57, NR-58 und NR-62 sollte ohne eine weitere, begründete Aggregierung unterbleiben.
+
+```{r, Naturraum Pfeile Klingen}
+dbGetQuery(ndb, "Select GruppeID, Info, count(*) as 'Anz. Objekte'
+                 from Pfeile_Klingen_Masse_Raum
+                 group by 1, 2;")
+```
+
+Die Pfeilspitzen besitzen insgesamt eher eine sehr ähnliche Breite, die überwiegend zwischen 1,5 cm und 2,2 cm liegt. Auffallend sind hier einzelne Ausreißer, vor allem die Pfeilspitzen mit Breiten von über 3,0 cm. Es handelt sich hierbei überwiegend um Pfeilspitzen mit Schaftdorn oder Schäftungsplatte, auch bei einem Halbfabrikat (KatNr 718). Lediglich bei KatNr 388 handelt es sich um eine Pfeilspitze mit konvexer Basis und für die KatNr 911 liegen keine weiteren Angaben vor: 
+
+```{r, Überbreite Pfeispitzen, results='asis'}
+dbGetQuery(ndb, "select group_concat('KatNr ' || KatNr || ': ' || 
+                                      Breite  || ' cm', ', ') 
+                from Pfeile_Klingen_Masse_Raum 
+                where Objekt like 'Pfeil%' and Breite > 3;")[1,1]
+```
+
+Das Süderbergland (NR-33) und das Obere Weserbergland (NR-36) sind sehr ähnlich in der Verteilung, die Breite der Pfeilspitzen ist deutlich kleiner als die der Klingen. Da sich die jeweiligen Interquartilbereiche ausschließen, ist dieser Unterschied vermutlich signifikant. Bei den Artefakten des Unteren Weserberglandes ist der Unterschied durch die wenigen, sehr breiten Klingen deutlich größer. Aufgrund der geringen Anzahl soll dies aber nicht überbewertet oder getrennt betrachtet werden. Die Verteilung der Breiten von Pfeilspitzen und Klingen in der Westfälischen Bucht (NR-54) zeigen eine deutliche Überlappung der Interquartilabstände. Die Ursache liegt hier weniger bei den Pfeilspitzen, deren Breite insgesamt ja sehr normiert erscheint, sondern viel mehr bei den insgesamt deutlich schmaler ausfallenden Klingen. Die Westfälische Tieflandsbucht  unterscheiden sich damit sehr deutlich von den vorgenannten bergigen Naturräumen. 
+
+```{sql Flintanteil Pfeilspitzen Klingen, connection = ndb}
+select GruppeID, sum(iif(wert like '%Flint%',1,0)) as 'Flint',
+				sum(iif(wert not like '%Flint%',1,0)) as 'kein Flint',
+				round(sum(iif(wert not like '%Flint%',1,0))*1.0/
+				      sum(iif(wert like '%Flint%',1,0)),2) as 'Anteil'
+from Pfeile_Klingen_Masse_Raum
+group by 1;
+```
+
+Die Materialangaben beschränken sich überwiegend auf die Bezeichnung als "Flintpfeilspitze" oder "Flintklinge", nur selten liegt eine dezidiert Angabe vor: "westeuropäischer Feuerstein" (KatNr 107, 791), "GP-Feuerstein" (Grand-Pessigny, KatNr 325), Kieselschiefer (KatNr 590) oder "Rijkholtfeuerstein" (KatNr 212). Damit kann nur zwischen "Flint" und dem Fehlen dieser Angabe für eine Quantifizierung unterschieden werden. Gegenüber dem Süderbergland und dem Oberen Weserbergland weist die Westfälische Tieflandsbucht einen leicht höheren Anteil fehlender Materialangaben auf. Allerdings ist der Anteil im Unteren Weserbergland noch höher und erreicht beinahe Parität. Hier könnte sich ein Unterschied andeuten, der jedoch durch eine eindeutige Materialansprache zu überprüfen wäre.
+
+Damit ist die insgesamt geringere Breite der Klingen in der Westfälischen Tieflandsbucht nicht gut zu interpretieren. Sie kann einerseits auf eine unzureichende Ressource hinweisen, andererseits aber auch in dem hier  vorliegenden Bedarf begründet sein. 
+
+## Dolche und Klingen
+
+Auf die Frage nach der Verfügbarkeit von Ressourcen zielt auch der Vergleich der Breiten zwischen Dolchen und Klingen. Die zugehörige Sicht (*view*) für die  Zusammenstellung der Daten ist in der DB gespeichert.  
+
+```{r SQL Dolche Klingen Masse Raum, results='asis'}
+dbGetQuery(ndb, "select sql from sqlite_master 
+        where type = 'view' and name = 'Dolche_Klingen_Masse_Raum';") %>%
+  gsub('\r\n', '  \n', .) %>%
+  gsub('CREATE VIEW', '-\u200B- CREATE VIEW', ., fixed = TRUE) %>%
+  cat()
+```
+
+Nicht alle aufgeführten Dolche und Klingen liefern ein Breiten oder Längenmaß.
+
+```{sql Dolche Klingen Anteile, connection = ndb}
+select Objekt, sum(iif(Breite > 0, 1, 0)) as 'mit Br.', 
+               sum(iif(Breite = 0, 1, 0)) as 'ohne Br.',
+               sum(iif(Laenge > 0, 1, 0)) as 'mit L.', 
+               sum(iif(Laenge = 0, 1, 0)) as 'ohne L.',
+               count(*) as 'Insgesamt'
+from Dolche_Klingen_Masse_Raum
+group by 1;
+```
+
+```{r Dolche Klingen Daten einlesen}
+dbReadTable(ndb, "Dolche_Klingen_Masse_Raum") %>%
+  transform(Breite = ifelse(Breite == 0, NA, Breite)) %>%
+  transform(Laenge = ifelse(Laenge == 0, NA, Laenge)) %>%
+  ggplot(., aes(x = GruppeID, y = Breite, fill = Objekt)) +
+    geom_boxplot(position = position_dodge(width = 0.75, preserve = "single"),
+                  outlier.shape = NA) +
+    scale_fill_manual(values = c('lightgreen', 'lightblue')) +
+    geom_point(aes(color = Objekt), alpha = 0.4, 
+              position = position_jitterdodge(jitter.width = 0.5,
+                                             dodge.width = 0.75)) +
+    scale_color_manual(values = c('darkgreen', 'darkblue')) +
+    labs(title = "Dolche & Klingen", x = "Naturraum", y = "Breite (cm)") +
+    theme(
+      axis.title = element_text(size = 12)
+    )  
+```
+
+Auch bei den Dolchklingen gibt es bemerkenswert große Breiten von 4,5 cm. Es handelt sich um einen atypischen Dolch mit einem auffallend rhombischen Umriss oder eine Doppelspitze (KatNr 50), das Fragment einer vermeintlichen Dolchspitze (KatNr 137), eine tropfenförmige Sonderform (KatNr 706) und einen Dolch vom Typ V (KatNr 828): 
+
+```{r, Überbreite Dolche, results='asis'}
+dbGetQuery(ndb, "select group_concat('KatNr ' || KatNr || ': ' || 
+                                      Breite || ' cm', ', ') 
+                from Dolche_Klingen_Masse_Raum 
+                where Objekt like 'Dolch%' and Breite > 4.5;")[1,1]
+```
+
+Ähnlich wie bei den Pfeilspitzen liegen auch die Breiten der Dolche in allen Naturräumen annähernd in einem Bereich. Ihre Interquartile liegen zwischen 1,8 cm und 3,5 cm und damit annähernd gleich auf mit den Breiten der jeweiligen Klingen oder nur geringfügig höher. Lediglich in der Westfälischen Tieflandsbucht sind die Dolche in großer Anzahl vertreten und mit dem Median bei 2,9 cm deutlich breiter als die Klingen mit einem Median bei ca. 2.1 cm. Die Dolche sind hier demnach aus den jeweils optimalen, breitesten Halbfabrikaten gefertigt, oder sie wurden zu einem großen Anteil aus einem importiertem Rohmaterial gefertigt bzw. als Fertigprodukt importiert.
+
+## Rohmaterialversorgung
+
+Die Frage nach dem verwendeten Rohmaterial scheint damit von zentraler Bedeutung. Da in der vorliegenden DB das Material nicht als eigenständiges Attribut definiert wurde, muss es, wie bei den Artefakten, aus dem vorliegenden Katalogtext abgefragt werden. Die folgende SQL-Anweisung verwendet dafür eine schlichte aber lange hierarchisch organisierte CASE-WHEN-Anweisung. "Rijkholtfeuerstein" wird hierdurch ausschließlich als "%Rijkholt%" und nicht erneut als "%Feuerst%" gezählt. 
+
+```{r Material Artefakte}
+dbGetQuery(ndb, "SELECT 
+    CASE
+      WHEN a.Wert LIKE '%GP-%' THEN 'Grand-Pessigny'
+		  WHEN a.Wert LIKE '%Lousberg%' THEN 'Lousberg'
+		  WHEN a.Wert LIKE '%Rijkholt%' THEN 'Rijkholtfeuerstein'
+		  WHEN a.Wert LIKE '%westeuropäisch%' THEN 'westeuropäischer Feuerstein'
+		  WHEN a.Wert LIKE '%Kieselschiefer%' THEN 'Kieselschiefer'
+		  WHEN a.Wert LIKE '%Quarzit%' THEN 'Quarzit'
+		  WHEN a.Wert LIKE '%Kupfer%' THEN ' Kupfer'
+		  WHEN a.Wert LIKE '%Silex%' THEN 'Silex'
+		  WHEN a.Wert LIKE '%Feuerst%' THEN 'Feuerstein'
+		  WHEN a.Wert LIKE '%Flint%' THEN 'Flint'
+		  else 'sonst.'
+	  END AS Material,
+    CASE 
+		  WHEN a.Wert like '%Dolch%' then 'Dolch'
+	    WHEN a.Wert like '%Pfeilsp%' then 'Pfeilspitze'
+	    WHEN a.Wert like '%Klinge%' then 'Klinge'
+	    ELSE 'sonst.'
+	  END AS Objekt,
+	  count(*) as 'Anzahl'
+  FROM Katalog AS a where Attribut = 'Fundobjekt'
+  group by 1, 2
+  having Material <> 'sonst.';")
+```
+
+Die überwiegende Anzahl der Artefakte wird allgemein als Flint-, Silex, oder Feuerstein bezeichnet,  diese sind keiner Provenienz zuzuweisen. Daneben treten aber zahlreiche Rohstoffe auf, die aus den westlich anschließenden Gebieten stammen. Das sind in geringer Stückzahl Lousberg (1) und Rijkholt (3) sowie in etwas größerer Anzahl 21 Artefakten aus Grand-Pressigny und 22 aus westeuropäischer Feuerstein. Der für fünf Artefakte verwendete Kieselschiefer verweist auf eine Herkunft aus dem Süderbergbergland und dem anschließenden Rothaargebirge.
+
+```{r Material Naturraum}
+dbGetQuery(ndb, "SELECT b.GruppeID, a.Material, count(a.KatNr) as 'Anzahl' 
+FROM (
+	SELECT KatNr, 'Grand-Pessigny' AS Material 
+		FROM Katalog WHERE Wert LIKE '%GP-%' AND Attribut = 'Fundobjekt'
+	UNION ALL
+	SELECT KatNr, 'Lousberg' AS Material 
+		FROM Katalog WHERE Wert LIKE '%Lousberg%' AND Attribut = 'Fundobjekt' 
+	UNION ALL
+	SELECT KatNr, 'Rijkholtfeuerstein' AS Material 
+		FROM Katalog WHERE Wert LIKE '%Rijkholt%' AND Attribut = 'Fundobjekt' 
+	UNION ALL
+	SELECT KatNr, 'westeuropäischer Feuerstein' AS Material 
+		FROM Katalog WHERE Wert LIKE '%westeuropäisch%' AND Attribut = 'Fundobjekt' 
+	UNION ALL
+	SELECT KatNr, 'Kieselschiefer' AS Material 
+		FROM Katalog WHERE Wert LIKE '%Kieselschiefer%' AND Attribut = 'Fundobjekt' 
+	UNION ALL
+	SELECT KatNr, 'Quarzit' AS Material 
+		FROM Katalog WHERE Wert LIKE '%Quarzit%' AND Attribut = 'Fundobjekt' 
+	UNION ALL
+	SELECT KatNr, 'Kupfer' AS Material 
+		FROM Katalog WHERE Wert LIKE '%Kupfer%' AND Attribut = 'Fundobjekt' 
+--	UNION ALL
+--	SELECT KatNr, 'Silex' AS Material 
+--		FROM Katalog WHERE Wert LIKE '%Silex%' AND Attribut = 'Fundobjekt' 
+--	UNION ALL
+--	SELECT KatNr, 'Feuerstein' AS Material 
+--		FROM Katalog WHERE Wert LIKE '%Feuerst%' AND Attribut = 'Fundobjekt' 
+--	UNION ALL
+--	SELECT KatNr, 'Flint' AS Material 
+--		FROM Katalog WHERE Wert LIKE '%Flint%' AND Attribut = 'Fundobjekt'
+    ) as a
+left join (SELECT * FROM KatNrGruppen WHERE length(GruppeID) = 5) as b on a.KatNr = b.KatNr
+GROUP BY 1, 2;")
+```
+
+```{r Grosser Naturraum, results = 'asis'}
+dbGetQuery(ndb, "SELECT group_concat(GruppeID || ': ' || Info, ', ') 
+           FROM Gruppen WHERE GruppeID IN ('NR-33', 'NR-36', 'NR-53', 
+           'NR-54', 'NR-57', 'NR-58', 'NR-62');")[1,1] 
+```
+
+Für die letzte Tabelle wird bewusst etwas anders gezählt. Hier wird der Filter auf den jeweiligen Schlüsselbegriff auf alle Fundobjekte angewendet und die einzelnen Ergebnisse kombiniert. Der Begriff "Rijkholtfeuerstein"  wird sowohl durch "%Rijkholt%" als auch durch "%Feuerst%" gefunden und gezählt. Da aber allgemeine Bezeichnungen wie Flint oder Feuerstein durch Kommentierung (--) exkludiert sind, sollte sich die Anzahl entsprechen. 
+
+Die importierten oder potentiell importierten Rohmaterialien verteilen sich auf fast alle Naturräume. Sie sind demnach nicht unmittelbar charakteristisch für die Beckenlandschaften als potentielle Kommunikationswege, auch wenn die Westfälische Tieflandsbucht mit den besonders großen Fundmengen auch größere Importzahlen aufweist. 
