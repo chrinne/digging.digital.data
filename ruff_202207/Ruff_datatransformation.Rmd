@@ -303,12 +303,16 @@ sql <- "select group_concat(site ||': '|| n, ', ') as 'multiple site names'
 DBI::dbGetQuery(db01, sql)[1,1] |>
   cat()
 ```
-As the site names are not unique at the current level, we have to add an additional site_id. The current dataframe is written into the SQLite database.
+As the site names are not unique at the current level, we have to add an additional site_id. The current dataframe is written into the SQLite database. Unfortunately the "site_id" is the last column. To change the order is easier in R.
 
 ```{r}
 DBI::dbExecute(db01, "alter table sites add column site_id integer;")
 DBI::dbExecute(db01, "update sites set site_id = rowid;")
 sites <- dbReadTable(db01, "sites")
+sites <- cbind(site_id = sites$site_id,
+               sites[,1:19]) |>
+  as.data.frame()
+DBI::dbWriteTable(db01, "sites", sites, overwrite = TRUE)
 ```
 
 The sites are distributed all over Europe with concentrations in Denmark and central and Southeast Europe. 
@@ -380,6 +384,10 @@ To get a clean identification of each record set we create ind_id using the rowi
 DBI::dbExecute(db01, "alter table individuals add column ind_id integer;")
 DBI::dbExecute(db01, "update individuals set ind_id = rowid;")
 individuals <- dbReadTable(db01, "individuals")
+# move the ind_id to the first position
+individuals <- cbind(ind_id = individuals[,95],
+                     individuals[,1:94]) |>
+  as.data.frame()
 # convert fside and tside back to factor (left/right of Femur/Tibia)
 individuals$fside <- factor(individuals$fside, 
                   levels = c("right", "left"),
@@ -396,23 +404,88 @@ The table for the individuals provides 95 variables, many of them without conten
 ```{r pivot individual variales into a long format}
 individuals$fside <- as.integer(individuals$fside)
 individuals$tside <- as.integer(individuals$tside)
-ind_variables <- tidyr::pivot_longer(individuals,
-                            cols = 5:95,
+ind_measures <- tidyr::pivot_longer(individuals,
+                            cols = 6:95,
                             names_to = "variable",
                             values_to = "value",
                             values_drop_na = TRUE)
-DBI::dbWriteTable(db01, "ind_variables", ind_variables, overwrite = TRUE)
-ind_variables[1:10,] |>
+DBI::dbWriteTable(db01, "ind_measures", ind_measures, overwrite = TRUE)
+ind_measures[1:10,] |>
   knitr::kable()
 ```
 
-If you are happy with this data set you should remove the obsolete tables in the database and save the important dataframes to an R file.
+Unfortunately, the size of the dataset increases significantly due to the many duplicate values in the first five columns. We should split the data into one table for the individuals and a second one for the measurements. The ‘age_mean’ value depends on the ‘age_range’ and is added to the ‘ind_info’ table. We also convert ‘ind_measures$variable’ into a factor. Please note that the order of the measurements so far corresponds to the order of the columns in the original Excel file. The factor values are sorted in alphabetical order.
 
-```{r final clean up}
-DBI::dbExecute(db01, "drop table if exists orig_table;")
-DBI::dbExecute(db01, "drop table if exists individuals;")
-DBI::dbExecute(db01, "vacuum;")
-DBI::dbDisconnect(db01)
-save(list = c("ind_variables", "sites", "var_info"), 
+```{r split into ind_info and ind_measures}
+ind_info <- individuals[,1:6]
+ind_measures <- ind_measures[,c(1,6:7)]
+ind_measures <- ind_measures[ind_measures$variable != "age_mean",]
+ind_measures$variable <- factor(ind_measures$variable)
+```
+
+If you are happy with this data set we should write the relevant dataframes to an R file.  
+
+```{r write the important dataframe in an R file}
+kept_dfs <- c("ind_info", "ind_measures", "sites", "var_info")
+save(list = kept_dfs, 
      file = "EuropeanDataSet_22_07.RData")
 ```
+
+In addition, we should clean the database, including a proper table definition with appropriate constrains. Please note that we delete all tables in our current database in the beginning.
+
+```{r final database clean up}
+# Get all and delete tables in the database. 
+all_tables <- dbGetQuery(db01, 
+                    "select name from sqlite_master where type = 'table'")[,1]
+for (i in seq_along(all_tables)){
+  t <- all_tables[i]
+  DBI::dbExecute(db01, paste0("drop table if exists ",t,";"))
+}
+DBI::dbExecute(db01, "vacuum;")
+# Write all dataframes into database with a similar name
+for (df in kept_dfs){
+  DBI::dbWriteTable(db01, paste0("tmp_",df), get(df), overwrite = TRUE)
+}
+# Create the corresponding empty tables
+for (df in kept_dfs){
+  DBI::dbExecute(db01, paste0("create table ", df, " as ",
+                              "select * from tmp_", df," limit 0;"))
+}
+# Add the constrains
+DBI::dbExecute(db01, 
+      "create unique index sites_unique_index on sites(site_id)")
+DBI::dbExecute(db01, 
+      "create unique index ind_info_unique_index on ind_info(ind_id)")
+DBI::dbExecute(db01, "alter table ind_info drop column site_id;")
+DBI::dbExecute(db01, "alter table ind_info add column site_id integer
+               references sites(site_id);")
+DBI::dbExecute(db01, "alter table ind_measures drop column ind_id;")
+DBI::dbExecute(db01, "alter table ind_measures add column ind_id integer
+               references ind_info(ind_id);")
+DBI::dbExecute(db01, "pragma foreign_keys=off;")
+for (df in kept_dfs){
+  copy_columns <- paste0(colnames(get(df)), collapse = ", ")
+  DBI::dbExecute(db01, paste0("replace into ", df, 
+                              " (", copy_columns, 
+                              ") select ", copy_columns,
+                              " from tmp_", df ,";"))
+}
+DBI::dbExecute(db01, "pragma foreign_keys=on;")
+for (df in kept_dfs){
+  DBI::dbExecute(db01, 
+                 paste0("drop table if exists tmp_", df, ";"), 
+                 overwrite = TRUE)
+}
+DBI::dbExecute(db01, "vacuum;")
+```
+
+```{r}
+DBI::dbExecute(db01, "pragma integrity_check;")
+```
+```{r}
+DBI::dbExecute(db01, "pragma foreign_key_check;")
+```
+
+
+
+

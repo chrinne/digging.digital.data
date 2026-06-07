@@ -2109,12 +2109,17 @@ DBI::dbGetQuery(db01, sql)[1,1] |&gt;
 <pre><code>## Arene Candide: 4, Braunsdorf: 2, Bystrocice: 2, Cockey Down: 2, Cro-Magnon: 3, Culoz: 2, Dolní Vestonice: 3, Erfurt-Nordhauser St.: 2, Franzhausen: 2, Franzhausen I: 2, Grotte des Enfants: 3, Hazleton North: 2, Helsinki: 10, Hoedic: 2, Los Canes: 3, Luis Lopez Collection: 2, Moita de Sebastiao: 2, Nordenbrogård: 2, Oberkassel: 2, Pavlov: 2, Porvoo: 2, Poundbury Farm: 2, Predmostí: 2, Radovesice: 2, Shrewton: 2, Skateholm I: 4, Teviec: 4, Unseburg: 2, Vemmeltofte Skovridergår: 2, Wetwang Slack: 2</code></pre>
 <p>As the site names are not unique at the current level, we have to add
 an additional site_id. The current dataframe is written into the SQLite
-database.</p>
+database. Unfortunately the “site_id” is the last column. To change the
+order is easier in R.</p>
 <pre class="r"><code>DBI::dbExecute(db01, &quot;alter table sites add column site_id integer;&quot;)</code></pre>
 <pre><code>## [1] 0</code></pre>
 <pre class="r"><code>DBI::dbExecute(db01, &quot;update sites set site_id = rowid;&quot;)</code></pre>
 <pre><code>## [1] 320</code></pre>
-<pre class="r"><code>sites &lt;- dbReadTable(db01, &quot;sites&quot;)</code></pre>
+<pre class="r"><code>sites &lt;- dbReadTable(db01, &quot;sites&quot;)
+sites &lt;- cbind(site_id = sites$site_id,
+               sites[,1:19]) |&gt;
+  as.data.frame()
+DBI::dbWriteTable(db01, &quot;sites&quot;, sites, overwrite = TRUE)</code></pre>
 <p>The sites are distributed all over Europe with concentrations in
 Denmark and central and Southeast Europe.</p>
 <pre class="r"><code>psites &lt;- dbGetQuery(db01, &quot;select site, latitude, longitude 
@@ -2218,6 +2223,10 @@ using the rowid in the current table.</p>
 <pre class="r"><code>DBI::dbExecute(db01, &quot;update individuals set ind_id = rowid;&quot;)</code></pre>
 <pre><code>## [1] 2177</code></pre>
 <pre class="r"><code>individuals &lt;- dbReadTable(db01, &quot;individuals&quot;)
+# move the ind_id to the first position
+individuals &lt;- cbind(ind_id = individuals[,95],
+                     individuals[,1:94]) |&gt;
+  as.data.frame()
 # convert fside and tside back to factor (left/right of Femur/Tibia)
 individuals$fside &lt;- factor(individuals$fside, 
                   levels = c(&quot;right&quot;, &quot;left&quot;),
@@ -2239,17 +2248,18 @@ from the factor variables fside and tside, the laterality of Femur and
 Tibia.</p>
 <pre class="r"><code>individuals$fside &lt;- as.integer(individuals$fside)
 individuals$tside &lt;- as.integer(individuals$tside)
-ind_variables &lt;- tidyr::pivot_longer(individuals,
-                            cols = 5:95,
+ind_measures &lt;- tidyr::pivot_longer(individuals,
+                            cols = 6:95,
                             names_to = &quot;variable&quot;,
                             values_to = &quot;value&quot;,
                             values_drop_na = TRUE)
-DBI::dbWriteTable(db01, &quot;ind_variables&quot;, ind_variables, overwrite = TRUE)
-ind_variables[1:10,] |&gt;
+DBI::dbWriteTable(db01, &quot;ind_measures&quot;, ind_measures, overwrite = TRUE)
+ind_measures[1:10,] |&gt;
   knitr::kable()</code></pre>
 <table>
 <thead>
 <tr class="header">
+<th align="right">ind_id</th>
 <th align="right">site_id</th>
 <th align="left">specimen_no</th>
 <th align="left">sex</th>
@@ -2260,6 +2270,7 @@ ind_variables[1:10,] |&gt;
 </thead>
 <tbody>
 <tr class="odd">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2268,6 +2279,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">49.00</td>
 </tr>
 <tr class="even">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2276,6 +2288,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">72.90</td>
 </tr>
 <tr class="odd">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2284,6 +2297,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">170.65</td>
 </tr>
 <tr class="even">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2292,6 +2306,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">71.90</td>
 </tr>
 <tr class="odd">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2300,6 +2315,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">1.00</td>
 </tr>
 <tr class="even">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2308,6 +2324,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">462.00</td>
 </tr>
 <tr class="odd">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2316,6 +2333,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">459.00</td>
 </tr>
 <tr class="even">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2324,6 +2342,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">437.00</td>
 </tr>
 <tr class="odd">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2332,6 +2351,7 @@ ind_variables[1:10,] |&gt;
 <td align="right">49.50</td>
 </tr>
 <tr class="even">
+<td align="right">1</td>
 <td align="right">117</td>
 <td align="left">A284</td>
 <td align="left">male</td>
@@ -2341,18 +2361,83 @@ ind_variables[1:10,] |&gt;
 </tr>
 </tbody>
 </table>
-<p>If you are happy with this data set you should remove the obsolete
-tables in the database and save the important dataframes to an R
-file.</p>
-<pre class="r"><code>DBI::dbExecute(db01, &quot;drop table if exists orig_table;&quot;)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code>DBI::dbExecute(db01, &quot;drop table if exists individuals;&quot;)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code>DBI::dbExecute(db01, &quot;vacuum;&quot;)</code></pre>
-<pre><code>## [1] 0</code></pre>
-<pre class="r"><code>DBI::dbDisconnect(db01)
-save(list = c(&quot;ind_variables&quot;, &quot;sites&quot;, &quot;var_info&quot;), 
+<p>Unfortunately, the size of the dataset increases significantly due to
+the many duplicate values in the first five columns. We should split the
+data into one table for the individuals and a second one for the
+measurements. The ‘age_mean’ value depends on the ‘age_range’ and is
+added to the ‘ind_info’ table. We also convert ‘ind_measures$variable’
+into a factor. Please note that the order of the measurements so far
+corresponds to the order of the columns in the original Excel file. The
+factor values are sorted in alphabetical order.</p>
+<pre class="r"><code>ind_info &lt;- individuals[,1:6]
+ind_measures &lt;- ind_measures[,c(1,6:7)]
+ind_measures &lt;- ind_measures[ind_measures$variable != &quot;age_mean&quot;,]
+ind_measures$variable &lt;- factor(ind_measures$variable)</code></pre>
+<p>If you are happy with this data set we should write the relevant
+dataframes to an R file.</p>
+<pre class="r"><code>kept_dfs &lt;- c(&quot;ind_info&quot;, &quot;ind_measures&quot;, &quot;sites&quot;, &quot;var_info&quot;)
+save(list = kept_dfs, 
      file = &quot;EuropeanDataSet_22_07.RData&quot;)</code></pre>
+<p>In addition, we should clean the database, including a proper table
+definition with appropriate constrains. Please note that we delete all
+tables in our current database in the beginning.</p>
+<pre class="r"><code># Get all and delete tables in the database. 
+all_tables &lt;- dbGetQuery(db01, 
+                    &quot;select name from sqlite_master where type = &#39;table&#39;&quot;)[,1]
+for (i in seq_along(all_tables)){
+  t &lt;- all_tables[i]
+  DBI::dbExecute(db01, paste0(&quot;drop table if exists &quot;,t,&quot;;&quot;))
+}
+DBI::dbExecute(db01, &quot;vacuum;&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code># Write all dataframes into database with a similar name
+for (df in kept_dfs){
+  DBI::dbWriteTable(db01, paste0(&quot;tmp_&quot;,df), get(df), overwrite = TRUE)
+}
+# Create the corresponding empty tables
+for (df in kept_dfs){
+  DBI::dbExecute(db01, paste0(&quot;create table &quot;, df, &quot; as &quot;,
+                              &quot;select * from tmp_&quot;, df,&quot; limit 0;&quot;))
+}
+# Add the constrains
+DBI::dbExecute(db01, 
+      &quot;create unique index sites_unique_index on sites(site_id)&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>DBI::dbExecute(db01, 
+      &quot;create unique index ind_info_unique_index on ind_info(ind_id)&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>DBI::dbExecute(db01, &quot;alter table ind_info drop column site_id;&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>DBI::dbExecute(db01, &quot;alter table ind_info add column site_id integer
+               references sites(site_id);&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>DBI::dbExecute(db01, &quot;alter table ind_measures drop column ind_id;&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>DBI::dbExecute(db01, &quot;alter table ind_measures add column ind_id integer
+               references ind_info(ind_id);&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>DBI::dbExecute(db01, &quot;pragma foreign_keys=off;&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>for (df in kept_dfs){
+  copy_columns &lt;- paste0(colnames(get(df)), collapse = &quot;, &quot;)
+  DBI::dbExecute(db01, paste0(&quot;replace into &quot;, df, 
+                              &quot; (&quot;, copy_columns, 
+                              &quot;) select &quot;, copy_columns,
+                              &quot; from tmp_&quot;, df ,&quot;;&quot;))
+}
+DBI::dbExecute(db01, &quot;pragma foreign_keys=on;&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>for (df in kept_dfs){
+  DBI::dbExecute(db01, 
+                 paste0(&quot;drop table if exists tmp_&quot;, df, &quot;;&quot;), 
+                 overwrite = TRUE)
+}
+DBI::dbExecute(db01, &quot;vacuum;&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>DBI::dbExecute(db01, &quot;pragma integrity_check;&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>DBI::dbExecute(db01, &quot;pragma foreign_key_check;&quot;)</code></pre>
+<pre><code>## [1] 0</code></pre>
 </div>
 </div>
 </div>
